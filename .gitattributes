@@ -1,0 +1,4 @@
+# Store text files with LF line endings (what Vercel's Linux servers use)
+* text=auto eol=lf
+*.png binary
+*.ico binary

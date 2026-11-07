@@ -1,0 +1,121 @@
+// EasyGate data model (PostgreSQL, e.g. Neon).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL") // pooled connection, used by the app
+  directUrl = env("DATABASE_URL_UNPOOLED") // direct connection, used for migrations
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String? // null for accounts created with Google sign-in
+  googleId     String?  @unique
+  role         String   @default("STUDENT") // STUDENT | ORGANIZER | ADMIN
+  campus       String?
+  phone        String?
+  createdAt    DateTime @default(now())
+
+  events       Event[]                  @relation("OrganizerEvents")
+  orders       Order[]
+  tickets      Ticket[]
+  applications OrganizerApplication[]
+}
+
+// Students apply to become organizers; an admin approves or rejects.
+model OrganizerApplication {
+  id           String    @id @default(cuid())
+  orgName      String // club, association, or brand name
+  phone        String
+  eventTypes   String // what kind of events they plan to host
+  socialHandle String?
+  message      String?
+  status       String    @default("PENDING") // PENDING | APPROVED | REJECTED
+  reviewNote   String?
+  createdAt    DateTime  @default(now())
+  reviewedAt   DateTime?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([status])
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  description String
+  category    String // PARTY | CONCERT | CONFERENCE | SPORTS | RELIGIOUS | OTHER
+  campus      String
+  venue       String
+  startsAt    DateTime
+  endsAt      DateTime?
+  imageUrl    String?
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  organizerId String
+  organizer   User   @relation("OrganizerEvents", fields: [organizerId], references: [id])
+
+  ticketTypes TicketType[]
+  orders      Order[]
+  tickets     Ticket[]
+
+  @@index([startsAt])
+  @@index([campus])
+}
+
+model TicketType {
+  id        String @id @default(cuid())
+  name      String // e.g. Regular, VIP
+  priceKobo Int // 0 = free. Paystack amounts are in kobo (NGN x 100)
+  quantity  Int
+  sold      Int    @default(0)
+
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  orders  Order[]
+  tickets Ticket[]
+}
+
+model Order {
+  id         String   @id @default(cuid())
+  reference  String   @unique // Paystack transaction reference
+  quantity   Int
+  amountKobo Int
+  status     String   @default("PENDING") // PENDING | PAID | FAILED
+  createdAt  DateTime @default(now())
+  paidAt     DateTime?
+
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
+  eventId      String
+  event        Event      @relation(fields: [eventId], references: [id])
+  ticketTypeId String
+  ticketType   TicketType @relation(fields: [ticketTypeId], references: [id])
+
+  tickets Ticket[]
+}
+
+model Ticket {
+  id          String    @id @default(cuid())
+  code        String    @unique // encoded in the QR code
+  checkedInAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  orderId      String
+  order        Order      @relation(fields: [orderId], references: [id])
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
+  eventId      String
+  event        Event      @relation(fields: [eventId], references: [id])
+  ticketTypeId String
+  ticketType   TicketType @relation(fields: [ticketTypeId], references: [id])
+}
