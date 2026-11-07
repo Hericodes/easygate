@@ -10,7 +10,7 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "prisma db seed",
     "postinstall": "prisma generate",
-    "vercel-build": "prisma generate && prisma migrate deploy && next build",
+    "vercel-build": "node scripts/vercel-build.mjs",
     "db:deploy": "prisma migrate deploy",
     "make-admin": "tsx prisma/make-admin.ts"
   },

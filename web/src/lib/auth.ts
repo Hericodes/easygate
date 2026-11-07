@@ -3,7 +3,15 @@ import { cookies, headers } from "next/headers";
 import { prisma } from "./db";
 
 const COOKIE = "eg_session";
-const secret = () => new TextEncoder().encode(process.env.AUTH_SECRET ?? "dev-secret");
+const secret = () => {
+  const value = process.env.AUTH_SECRET;
+  if (!value) {
+    // Never sign or accept sessions with a guessable fallback on the live site.
+    if (process.env.NODE_ENV === "production") throw new Error("AUTH_SECRET is not set");
+    return new TextEncoder().encode("dev-secret");
+  }
+  return new TextEncoder().encode(value);
+};
 
 export type SessionUser = {
   id: string;

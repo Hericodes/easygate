@@ -54,8 +54,8 @@ To make someone an admin, they sign up first, then run `npm run make-admin -- th
    | Variable | Value |
    | --- | --- |
    | `DATABASE_URL` | Production database, pooled connection string |
-   | `DATABASE_URL_UNPOOLED` | Production database, direct connection string |
-   | `AUTH_SECRET` | A new long random string (not the dev one) |
+   | `DATABASE_URL_UNPOOLED` | Production database, direct connection string (optional with Neon: worked out from `DATABASE_URL`) |
+   | `AUTH_SECRET` | A new long random string, 32+ characters (not the dev one). The build refuses to deploy without it |
    | `PAYSTACK_SECRET_KEY` | `sk_test_…` to test payments, `sk_live_…` for real money |
    | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Same as local (optional) |
    | `APP_URL` | Optional, e.g. `https://easygate.vercel.app` |
