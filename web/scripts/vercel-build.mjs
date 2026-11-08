@@ -59,7 +59,13 @@ if (process.argv.includes("--check")) {
   process.exit(0);
 }
 
-const run = (cmd) => execSync(cmd, { stdio: "inherit", env });
+const run = (cmd) => {
+  try {
+    execSync(cmd, { stdio: "inherit", env });
+  } catch (error) {
+    process.exit(error.status ?? 1); // the command has already printed why it failed
+  }
+};
 run("prisma generate");
 run("prisma migrate deploy");
 run("node scripts/check-live-database.mjs");
