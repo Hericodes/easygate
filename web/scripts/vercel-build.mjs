@@ -32,6 +32,13 @@ if (secretIssue) {
   problems.push(`AUTH_SECRET ${detail}. It must be a long random string (32+ characters), different from your local one`);
 }
 
+const appUrl = env.APP_URL?.trim();
+if (appUrl && (!appUrl.startsWith("https://") || /localhost|127\.0\.0\.1/.test(appUrl))) {
+  problems.push(
+    `APP_URL is "${appUrl}", which only works on your own computer. Delete APP_URL (the site's own address is used automatically) or set it to your live https:// address`,
+  );
+}
+
 if (problems.length) {
   console.error("\nFix these in Vercel (Project > Settings > Environment Variables), then redeploy:");
   for (const p of problems) console.error("  - " + p);
@@ -55,4 +62,5 @@ if (process.argv.includes("--check")) {
 const run = (cmd) => execSync(cmd, { stdio: "inherit", env });
 run("prisma generate");
 run("prisma migrate deploy");
+run("node scripts/check-live-database.mjs");
 run("next build");
