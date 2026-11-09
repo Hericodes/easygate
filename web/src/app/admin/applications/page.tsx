@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/admin";
 import { timeAgo } from "@/lib/format";
+import { ROLE_LABEL, isOrganizer } from "@/lib/auth";
 import Avatar from "@/components/Avatar";
 import EmptyState from "@/components/EmptyState";
 import ReviewButtons from "@/components/ReviewButtons";
@@ -17,7 +18,7 @@ const BADGE: Record<string, [string, string]> = {
 export default async function ApplicationsPage() {
   await requireAdmin("/admin/applications");
   const apps = await prisma.organizerApplication.findMany({
-    include: { user: { select: { name: true, email: true } } },
+    include: { user: { select: { name: true, email: true, role: true } } },
     orderBy: [{ status: "desc" }, { createdAt: "desc" }], // PENDING sorts first
     take: 100,
   });
@@ -54,6 +55,11 @@ export default async function ApplicationsPage() {
               </p>
               {a.message && <p className="rounded-xl bg-page px-3 py-2 text-sm text-ink/80 ring-1 ring-line">“{a.message}”</p>}
               {a.reviewNote && <p className="text-sm text-muted">Reason given: {a.reviewNote}</p>}
+              {a.status === "PENDING" && isOrganizer(a.user) && (
+                <p className="text-sm font-medium text-primary">
+                  Already has {ROLE_LABEL[a.user.role]} access. Approving won&apos;t change their role.
+                </p>
+              )}
               <p className="text-xs text-muted">Applied {timeAgo(a.createdAt)}</p>
             </div>
             {a.status === "PENDING" && <ReviewButtons id={a.id} />}

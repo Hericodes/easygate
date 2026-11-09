@@ -30,8 +30,10 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
           reviewedAt: new Date(),
         },
       }),
+      // Only students are upgraded. Someone who is already an organizer, admin or super admin
+      // keeps their role, so approving an old application can never demote anyone.
       ...(action === "APPROVE"
-        ? [prisma.user.update({ where: { id: app.userId }, data: { role: "ORGANIZER" } })]
+        ? [prisma.user.updateMany({ where: { id: app.userId, role: "STUDENT" }, data: { role: "ORGANIZER" } })]
         : []),
     ]);
     return NextResponse.json({ ok: true });
