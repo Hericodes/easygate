@@ -2,8 +2,9 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { requireOwnEvent } from "@/lib/organizer";
 import { eventDate, naira } from "@/lib/format";
+import EventCover from "@/components/EventCover";
 import StatTile from "@/components/StatTile";
-import { BanknoteIcon, CheckIcon, ScanIcon, TicketIcon } from "@/components/icons";
+import { BanknoteIcon, CheckIcon, ChevronLeftIcon, ScanIcon, TicketIcon } from "@/components/icons";
 
 export const dynamic = "force-dynamic";
 
@@ -22,20 +23,27 @@ export default async function ManageEventPage({ params }: { params: Promise<{ id
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <Link href="/organizer" className="inline-block py-2 text-sm font-medium text-zinc-500 transition-colors hover:text-brand-700">
-            ← Dashboard
-          </Link>
-          <h1 className="mt-1 font-display text-3xl font-bold tracking-tight">{event.title}</h1>
-          <p className="text-sm text-zinc-500">{eventDate(event.startsAt)} · {event.venue}, {event.campus}</p>
-        </div>
-        <div className="flex gap-2">
-          <Link href={`/events/${event.slug}`} className="btn-ghost">View public page</Link>
-          <Link href={`/organizer/events/${id}/scan`} className="btn-primary">
-            <ScanIcon className="h-4 w-4" /> Scan tickets
-          </Link>
-        </div>
+      <div>
+        <Link href="/organizer" className="inline-flex items-center gap-1 py-2 text-sm font-semibold text-muted transition-colors hover:text-brand-600">
+          <ChevronLeftIcon className="h-4 w-4" strokeWidth={2.4} /> Dashboard
+        </Link>
+        <section className="card flex flex-wrap items-center gap-4 p-3 sm:p-4">
+          <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl">
+            <EventCover title={event.title} category={event.category} imageUrl={event.imageUrl} size="sm" showTitle={false} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h1 className="text-xl font-extrabold leading-tight sm:text-2xl">{event.title}</h1>
+            <p className="mt-1 text-sm text-muted">
+              {eventDate(event.startsAt)} · {event.venue}, {event.campus}
+            </p>
+          </div>
+          <div className="flex w-full gap-2 sm:w-auto">
+            <Link href={`/events/${event.slug}`} className="btn-ghost flex-1 sm:flex-none">View page</Link>
+            <Link href={`/organizer/events/${id}/scan`} className="btn-primary flex-1 sm:flex-none">
+              <ScanIcon className="h-4 w-4" /> Scan tickets
+            </Link>
+          </div>
+        </section>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">

@@ -10,12 +10,14 @@ export default function TicketQr({
   code,
   title,
   usedLabel,
+  size = "md",
 }: {
   src: string;
   code: string;
   title: string;
   /** When set, the ticket was already scanned (shown as a "Used" stamp). */
   usedLabel?: string;
+  size?: "md" | "lg";
 }) {
   const [open, setOpen] = useState(false);
 
@@ -40,7 +42,11 @@ export default function TicketQr({
         className="relative mx-auto block rounded-2xl p-1 transition active:scale-[0.97]"
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={src} alt={`QR code for ticket ${code}`} className="h-44 w-44 rounded-xl" />
+        <img
+          src={src}
+          alt={`QR code for ticket ${code}`}
+          className={`rounded-xl [image-rendering:pixelated] ${size === "lg" ? "h-60 w-60" : "h-44 w-44"}`}
+        />
         {usedLabel ? (
           <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 rounded-xl border-4 border-red-500/80 bg-white/80 px-4 py-1 text-center font-display font-black uppercase text-red-500/90">
             <span className="block text-2xl leading-tight tracking-widest">Used</span>

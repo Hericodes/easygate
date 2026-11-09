@@ -1,121 +1,94 @@
 import Link from "next/link";
 import CategoryIcon from "./CategoryIcon";
-import { ArrowRightIcon, ClockIcon, FlameIcon, MapPinIcon, ZapIcon } from "./icons";
-import { categoryMeta, dateParts, naira, soonLabel } from "@/lib/format";
+import EventCover from "./EventCover";
+import { ArrowRightIcon, CalendarIcon, FlameIcon, MapPinIcon, ZapIcon } from "./icons";
+import { availability, categoryMeta, dateParts, lowestPrice, naira, soonLabel } from "@/lib/format";
 
-type Props = {
-  event: {
-    slug: string;
-    title: string;
-    category: string;
-    venue: string;
-    startsAt: Date;
-    imageUrl: string | null;
-    ticketTypes: { priceKobo: number; quantity: number; sold: number }[];
-  };
-  /** Position in the grid, used to stagger the entrance animation. */
-  index?: number;
+export type EventCardData = {
+  slug: string;
+  title: string;
+  category: string;
+  venue: string;
+  startsAt: Date;
+  imageUrl: string | null;
+  ticketTypes: { priceKobo: number; quantity: number; sold: number }[];
 };
 
-/** An event shaped like a ticket: artwork on top, a punched tear line, details below. */
-export default function EventCard({ event, index = 0 }: Props) {
+/** An event in a list: cover, type, title, date, venue, price, availability and a Get Ticket button. */
+export default function EventCard({ event, index = 0 }: { event: EventCardData; index?: number }) {
   const cat = categoryMeta(event.category);
   const d = dateParts(event.startsAt);
-  const prices = event.ticketTypes.map((t) => t.priceKobo);
-  const minPrice = prices.length ? Math.min(...prices) : 0;
-  const capacity = event.ticketTypes.reduce((n, t) => n + t.quantity, 0);
-  const left = event.ticketTypes.reduce((n, t) => n + Math.max(0, t.quantity - t.sold), 0);
-  const soldOut = left <= 0;
-  const sellingFast = !soldOut && (left <= 20 || left / capacity <= 0.2);
+  const { left, soldOut, sellingFast } = availability(event.ticketTypes);
+  const price = lowestPrice(event.ticketTypes);
   const soon = soonLabel(event.startsAt);
 
   return (
     <Link
       href={`/events/${event.slug}`}
-      className="ticket-shadow group animate-fade-up flex flex-col"
-      style={{ animationDelay: `${Math.min(index, 8) * 70}ms`, "--glow": cat.glow } as React.CSSProperties}
+      className="card group animate-fade-up flex gap-3.5 p-2.5 transition duration-300 [@media(hover:hover)]:hover:-translate-y-0.5 [@media(hover:hover)]:hover:shadow-[0_22px_40px_-20px_rgb(59_7_100/0.35)]"
+      style={{ animationDelay: `${Math.min(index, 8) * 60}ms` }}
     >
-      {/* Artwork */}
-      <div className={`ticket-top relative h-44 overflow-hidden rounded-t-3xl bg-linear-to-br ${cat.gradient}`}>
-        {event.imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={event.imageUrl}
-            alt=""
-            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-          />
-        ) : (
-          <>
-            <div aria-hidden className="dot-pattern absolute inset-0 opacity-50" />
-            <div aria-hidden className="absolute -right-12 -top-12 h-44 w-44 rounded-full border-[20px] border-white/15" />
-            <div aria-hidden className="absolute -bottom-16 left-10 h-36 w-36 rounded-full bg-white/20 blur-2xl" />
-            <CategoryIcon
-              category={event.category}
-              strokeWidth={1.5}
-              className="absolute -bottom-3 right-4 h-28 w-28 -rotate-12 text-white/45 transition duration-500 group-hover:rotate-0 group-hover:scale-110 group-hover:text-white/70"
-            />
-          </>
-        )}
-
-        {/* Calendar badge */}
-        <div className="absolute left-3 top-3 w-14 overflow-hidden rounded-2xl bg-white text-center shadow-lg">
-          <p className="bg-ink py-0.5 text-[10px] font-bold uppercase tracking-widest text-white">{d.month}</p>
-          <p className="py-1 font-display text-2xl font-bold leading-none text-ink">{d.day}</p>
-        </div>
-
-        <div className="absolute right-3 top-3 flex flex-col items-end gap-1.5">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-black/25 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur-md">
-            <CategoryIcon category={event.category} className="h-3.5 w-3.5" />
-            {cat.label}
-          </span>
-          {soon && !soldOut && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-accent px-2.5 py-1 text-xs font-bold text-ink shadow">
-              <ZapIcon className="h-3.5 w-3.5" />
-              {soon}
-            </span>
-          )}
-        </div>
-
-        {sellingFast && (
-          <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-xs font-bold text-orange-600 shadow">
-            <FlameIcon className="h-3.5 w-3.5" />
-            Selling fast
-          </span>
-        )}
+      <div className="relative min-h-[118px] w-[108px] shrink-0 self-stretch overflow-hidden rounded-[18px] sm:w-[136px]">
+        <EventCover title={event.title} category={event.category} imageUrl={event.imageUrl} size="sm" />
         {soldOut && (
-          <div className="absolute inset-0 grid place-items-center bg-ink/55 backdrop-blur-[2px]">
-            <span className="-rotate-6 rounded-xl border-2 border-white px-4 py-1.5 font-display text-xl font-bold uppercase tracking-wider text-white">
-              Sold out
-            </span>
-          </div>
+          <span className="absolute inset-0 grid place-items-center bg-[#0b0420]/60 text-[11px] font-extrabold uppercase tracking-wider text-white">
+            Sold out
+          </span>
         )}
       </div>
 
-      {/* Details */}
-      <div className="ticket-bottom relative flex flex-1 flex-col rounded-b-3xl bg-white p-5 pt-4">
-        <div aria-hidden className="absolute inset-x-5 top-0 border-t-2 border-dashed border-zinc-200" />
-        <h3 className="line-clamp-2 font-display text-lg font-bold leading-snug transition-colors group-hover:text-brand-700">
+      <div className="flex min-w-0 flex-1 flex-col py-1 pr-1">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${cat.tile}`}>
+            <CategoryIcon category={event.category} className="h-3.5 w-3.5" />
+            {cat.label}
+          </span>
+          {!soldOut && sellingFast ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-orange-50 px-2 py-0.5 text-[11px] font-semibold text-orange-600">
+              <FlameIcon className="h-3 w-3" />
+              {left <= 20 ? `${left} left` : "Selling fast"}
+            </span>
+          ) : (
+            !soldOut &&
+            soon && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-semibold text-brand-700">
+                <ZapIcon className="h-3 w-3" />
+                {soon}
+              </span>
+            )
+          )}
+        </div>
+
+        <h3 className="mt-1.5 line-clamp-2 text-[15px] font-bold leading-snug text-ink transition-colors group-hover:text-brand-700 sm:text-base">
           {event.title}
         </h3>
-        <p className="mt-2 flex items-center gap-1.5 text-sm text-zinc-500">
-          <ClockIcon className="h-4 w-4 shrink-0" />
-          {d.weekday}, {d.time}
+        <p className="mt-1 flex items-center gap-1.5 text-[12.5px] text-muted">
+          <CalendarIcon className="h-3.5 w-3.5 shrink-0" />
+          {d.weekday}, {d.day} {d.month} • {d.time}
         </p>
-        <p className="mt-1 flex items-center gap-1.5 text-sm text-zinc-500">
-          <MapPinIcon className="h-4 w-4 shrink-0" />
+        <p className="mt-0.5 flex items-center gap-1.5 text-[12.5px] text-muted">
+          <MapPinIcon className="h-3.5 w-3.5 shrink-0" />
           <span className="truncate">{event.venue}</span>
         </p>
-        <div className="mt-auto flex items-center justify-between pt-4">
-          {minPrice === 0 ? (
-            <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-bold text-emerald-700">Free</span>
+
+        <div className="mt-auto flex items-center justify-between gap-2 pt-2.5">
+          <p className="text-[13px] font-bold text-ink">
+            {price === 0 ? (
+              <span className="text-emerald-600">Free</span>
+            ) : (
+              <>
+                <span className="font-medium text-muted">From </span>
+                {naira(price)}
+              </>
+            )}
+          </p>
+          {soldOut ? (
+            <span className="rounded-full bg-zinc-100 px-3 py-1.5 text-xs font-semibold text-muted">Sold out</span>
           ) : (
-            <span className="text-sm text-zinc-500">
-              From <span className="font-display text-lg font-bold text-ink">{naira(minPrice)}</span>
+            <span className="btn-primary h-8 gap-1 px-3.5 text-xs">
+              Get Ticket <ArrowRightIcon className="h-3.5 w-3.5" strokeWidth={2.4} />
             </span>
           )}
-          <span className="grid h-10 w-10 place-items-center rounded-full bg-zinc-100 text-ink transition duration-300 group-hover:brand-gradient group-hover:text-white group-hover:shadow-lg group-hover:shadow-brand-500/30">
-            <ArrowRightIcon className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
-          </span>
         </div>
       </div>
     </Link>

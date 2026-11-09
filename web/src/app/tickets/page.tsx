@@ -1,14 +1,13 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
-import { getUserTickets } from "@/lib/user-tickets";
-import { categoryMeta, dateParts, eventDate } from "@/lib/format";
-import CategoryIcon from "@/components/CategoryIcon";
+import { hasEnded } from "@/lib/format";
 import Confetti from "@/components/Confetti";
 import EmptyState from "@/components/EmptyState";
-import TicketQr from "@/components/TicketQr";
+import TicketCard from "@/components/TicketCard";
 import TicketTabs from "@/components/TicketTabs";
-import { DownloadIcon, MapPinIcon, PartyIcon, TicketIcon } from "@/components/icons";
+import { PartyIcon, TicketIcon } from "@/components/icons";
 
 export const dynamic = "force-dynamic";
 
@@ -23,24 +22,39 @@ const ERRORS: Record<string, string> = {
 export default async function TicketsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ ref?: string; error?: string }>;
+  searchParams: Promise<{ ref?: string; error?: string; view?: string }>;
 }) {
   const user = await getCurrentUser();
   if (!user) redirect("/login?next=/tickets");
-  const { ref, error } = await searchParams;
-  const tickets = await getUserTickets(user.id);
-  const now = Date.now();
-  const upcoming = tickets.filter((t) => new Date(t.event.startsAt).getTime() > now - 12 * 3600e3);
-  const past = tickets.filter((t) => !upcoming.includes(t));
+  const { ref, error, view } = await searchParams;
+
+  const tickets = await prisma.ticket.findMany({
+    where: { userId: user.id },
+    select: {
+      id: true,
+      code: true,
+      checkedInAt: true,
+      ticketType: { select: { name: true } },
+      event: { select: { title: true, venue: true, startsAt: true, endsAt: true, category: true, imageUrl: true } },
+    },
+    orderBy: { event: { startsAt: "asc" } },
+  });
+  const upcoming = tickets.filter((t) => !hasEnded(t.event));
+  const past = tickets.filter((t) => hasEnded(t.event)).reverse();
+  const showPast = view === "past";
+  const list = showPast ? past : upcoming;
   const success = Boolean(ref && !error);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {success && <Confetti clearParam="ref" />}
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-display text-3xl font-bold tracking-tight">My tickets</h1>
-        <TicketTabs active="tickets" />
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-extrabold sm:text-3xl">My Tickets</h1>
+          <p className="mt-1 text-sm text-muted">Show the QR code at the gate. Each ticket can be scanned once.</p>
+        </div>
+        <TicketTabs active={showPast ? "past" : "upcoming"} counts={{ upcoming: upcoming.length, past: past.length }} />
       </div>
 
       {success && (
@@ -49,8 +63,8 @@ export default async function TicketsPage({
             <PartyIcon className="h-6 w-6" />
           </span>
           <div>
-            <p className="font-display text-lg font-bold">You&apos;re in!</p>
-            <p className="text-sm text-white/90">Your tickets are below. Show the QR code at the gate.</p>
+            <p className="text-lg font-extrabold">You&apos;re in!</p>
+            <p className="text-sm text-white/90">Your ticket is ready. Open it to see the QR code for the gate.</p>
           </div>
         </div>
       )}
@@ -60,98 +74,27 @@ export default async function TicketsPage({
         </div>
       )}
 
-      {tickets.length === 0 ? (
+      {list.length === 0 ? (
         <EmptyState
           icon={<TicketIcon className="h-7 w-7" />}
-          title="No tickets yet"
-          text="When you get a ticket, its QR code shows up here."
+          title={showPast ? "No past tickets" : "No upcoming tickets"}
+          text={
+            showPast
+              ? "Tickets for events you've attended will show up here."
+              : "When you get a ticket, it shows up here with its QR code."
+          }
         >
-          <Link href="/" className="btn-primary">
+          <Link href="/events" className="btn-primary">
             Find events
           </Link>
         </EmptyState>
       ) : (
-        <>
-          <TicketGrid tickets={upcoming} />
-          {past.length > 0 && (
-            <>
-              <h2 className="pt-4 font-display text-xl font-bold text-zinc-400">Past events</h2>
-              <div className="opacity-60 grayscale-[40%]">
-                <TicketGrid tickets={past} offset={upcoming.length} />
-              </div>
-            </>
-          )}
-        </>
+        <div className="grid gap-4 md:grid-cols-2">
+          {list.map((t, i) => (
+            <TicketCard key={t.id} ticket={t} index={i} />
+          ))}
+        </div>
       )}
-    </div>
-  );
-}
-
-function TicketGrid({
-  tickets,
-  offset = 0,
-}: {
-  tickets: Awaited<ReturnType<typeof getUserTickets>>;
-  offset?: number;
-}) {
-  return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {tickets.map((t, i) => {
-        const cat = categoryMeta(t.event.category);
-        const d = dateParts(t.event.startsAt);
-        return (
-          <div
-            key={t.id}
-            className="ticket-shadow animate-fade-up"
-            style={{ animationDelay: `${Math.min(i + offset, 8) * 80}ms`, "--glow": cat.glow } as React.CSSProperties}
-          >
-            <div className={`ticket-top relative overflow-hidden rounded-t-3xl bg-linear-to-br p-5 pb-6 text-white ${cat.gradient}`}>
-              <div aria-hidden className="dot-pattern absolute inset-0 opacity-30" />
-              <CategoryIcon
-                category={t.event.category}
-                strokeWidth={1.5}
-                className="absolute -right-3 -top-3 h-24 w-24 rotate-12 text-white/25"
-              />
-              <p className="relative text-xs font-semibold uppercase tracking-wider text-white/85">
-                {d.weekday} · {d.day} {d.month} · {d.time}
-              </p>
-              <Link
-                href={`/events/${t.event.slug}`}
-                className="relative mt-0.5 block py-1 font-display text-xl font-bold leading-snug hover:underline"
-              >
-                {t.event.title}
-              </Link>
-              <p className="relative mt-1.5 flex items-center gap-1.5 text-sm text-white/90">
-                <MapPinIcon className="h-4 w-4 shrink-0" />
-                <span className="truncate">{t.event.venue}</span>
-              </p>
-            </div>
-
-            <div className="ticket-bottom relative rounded-b-3xl bg-white p-5 pt-6 text-center">
-              <div aria-hidden className="absolute inset-x-5 top-0 border-t-2 border-dashed border-zinc-200" />
-              <TicketQr
-                src={t.qr}
-                code={t.code}
-                title={t.event.title}
-                usedLabel={t.checkedInAt ? eventDate(t.checkedInAt) : undefined}
-              />
-              <p className="mt-4 font-mono text-sm font-bold tracking-[0.18em]">{t.code}</p>
-              <span className="mt-2 inline-block rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700">
-                {t.ticketType.name}
-              </span>
-              {!t.checkedInAt && (
-                <a
-                  href={`/api/tickets/${t.code}/image`}
-                  download={`EasyGate-${t.code}.png`}
-                  className="btn-ghost mt-4 w-full py-3"
-                >
-                  <DownloadIcon className="h-4 w-4" /> Save ticket to phone
-                </a>
-              )}
-            </div>
-          </div>
-        );
-      })}
     </div>
   );
 }

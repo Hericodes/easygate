@@ -62,7 +62,7 @@ export default function InstallBanner() {
 
   if (!show) return null;
   return (
-    <div className="animate-pop fixed inset-x-3 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-40 sm:hidden">
+    <div className="animate-pop fixed inset-x-3 bottom-[calc(5.6rem+env(safe-area-inset-bottom))] z-40 sm:hidden">
       <div className="flex items-start gap-3 rounded-2xl bg-white p-3.5 shadow-2xl ring-1 ring-zinc-200">
         <span className="brand-gradient grid h-11 w-11 shrink-0 place-items-center rounded-xl text-white shadow-md shadow-brand-500/30">
           <TicketIcon className="h-6 w-6" />

@@ -1,19 +1,18 @@
 "use client";
 
-export default function LogoutButton({
-  className = "rounded-lg px-3 py-2 text-zinc-500 hover:bg-zinc-100",
-}: {
-  className?: string;
-}) {
+import { LogOutIcon } from "./icons";
+
+export default function LogoutButton({ className = "btn-ghost" }: { className?: string }) {
   return (
     <button
+      type="button"
       className={className}
       onClick={async () => {
         await fetch("/api/auth/logout", { method: "POST" });
         window.location.href = "/";
       }}
     >
-      Log out
+      <LogOutIcon className="h-4 w-4" /> Log out
     </button>
   );
 }

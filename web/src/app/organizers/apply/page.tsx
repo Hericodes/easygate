@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { getCurrentUser, isOrganizer } from "@/lib/auth";
 import ApplyForm from "@/components/ApplyForm";
+import { CrowdSilhouette, GateSilhouette } from "@/components/Art";
 import { CheckIcon, CreditCardIcon, ScanIcon, ShieldCheckIcon, TrendingUpIcon } from "@/components/icons";
 
 export const dynamic = "force-dynamic";
@@ -25,20 +26,21 @@ export default async function ApplyPage() {
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_440px]">
       <section>
-        <p className="animate-fade-up mb-4 inline-block rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700">
-          For OOU clubs, associations &amp; promoters
-        </p>
-        <h1
-          className="animate-fade-up font-display text-4xl font-bold leading-tight tracking-tight sm:text-5xl"
-          style={{ animationDelay: "60ms" }}
-        >
-          Host your event on <span className="gradient-text">EasyGate</span>
-        </h1>
-        <p className="animate-fade-up mt-4 max-w-lg text-zinc-600" style={{ animationDelay: "120ms" }}>
-          To keep events on EasyGate genuine, organizers are verified before they can sell
-          tickets. Apply below and we&apos;ll review your application, usually within 48 hours.
-        </p>
-        <ul className="mt-8 grid gap-4 sm:grid-cols-2">
+        <div className="hero-surface animate-fade-up relative isolate overflow-hidden rounded-[28px] p-6 text-white sm:p-8">
+          <GateSilhouette className="absolute -right-4 top-4 -z-10 h-32 w-48 text-white/[0.12] sm:right-6 sm:h-40 sm:w-60" />
+          <CrowdSilhouette className="absolute inset-x-0 bottom-0 -z-10 h-16 w-full text-[#12042a]/70" />
+          <p className="inline-block rounded-full bg-white/12 px-3 py-1 text-xs font-bold ring-1 ring-white/15">
+            For OOU clubs, associations &amp; promoters
+          </p>
+          <h1 className="mt-4 max-w-md text-3xl font-extrabold leading-tight sm:text-4xl">
+            Host your event on <span className="gradient-text-light">EasyGate</span>
+          </h1>
+          <p className="mt-3 max-w-lg pb-6 text-white/75">
+            To keep events on EasyGate genuine, organizers are verified before they can sell tickets. Apply here and
+            we&apos;ll review your application, usually within 48 hours.
+          </p>
+        </div>
+        <ul className="mt-5 grid gap-4 sm:grid-cols-2">
           {PERKS.map(({ Icon, title, text }, i) => (
             <li
               key={title}

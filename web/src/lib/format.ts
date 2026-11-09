@@ -7,55 +7,50 @@ export const CATEGORIES = [
     value: "PARTY",
     label: "Party",
     short: "Parties",
-    gradient: "from-fuchsia-500 via-pink-500 to-orange-400",
-    // Same gradient as plain colors, for generated images.
-    hex: ["#d946ef", "#fb923c"],
-    glow: "rgb(236 72 153 / 0.45)",
+    gradient: "from-pink-500 to-purple-500",
+    // Plain colours for generated covers and ticket images (stage lights).
+    hex: ["#ec4899", "#a855f7"],
+    tile: "bg-pink-50 text-pink-500",
   },
   {
     value: "CONCERT",
     label: "Concert",
     short: "Concerts",
-    gradient: "from-violet-600 via-purple-500 to-fuchsia-500",
-    // Same gradient as plain colors, for generated images.
-    hex: ["#7c3aed", "#d946ef"],
-    glow: "rgb(139 92 246 / 0.45)",
+    gradient: "from-brand-600 to-purple-500",
+    hex: ["#a855f7", "#6415f5"],
+    tile: "bg-purple-50 text-purple-600",
   },
   {
     value: "CONFERENCE",
-    label: "Conference / Talk",
+    label: "Talk",
     short: "Talks",
-    gradient: "from-blue-600 via-indigo-500 to-cyan-400",
-    // Same gradient as plain colors, for generated images.
-    hex: ["#2563eb", "#22d3ee"],
-    glow: "rgb(59 130 246 / 0.45)",
+    gradient: "from-indigo-500 to-sky-500",
+    hex: ["#6366f1", "#0ea5e9"],
+    tile: "bg-indigo-50 text-indigo-600",
   },
   {
     value: "SPORTS",
     label: "Sports",
     short: "Sports",
-    gradient: "from-emerald-500 via-green-500 to-lime-400",
-    // Same gradient as plain colors, for generated images.
-    hex: ["#10b981", "#a3e635"],
-    glow: "rgb(34 197 94 / 0.45)",
+    gradient: "from-emerald-500 to-sky-500",
+    hex: ["#10b981", "#0ea5e9"],
+    tile: "bg-amber-50 text-amber-500",
   },
   {
     value: "RELIGIOUS",
     label: "Religious",
     short: "Religious",
-    gradient: "from-amber-400 via-orange-400 to-rose-400",
-    // Same gradient as plain colors, for generated images.
-    hex: ["#fbbf24", "#fb7185"],
-    glow: "rgb(251 146 60 / 0.45)",
+    gradient: "from-amber-500 to-pink-500",
+    hex: ["#f59e0b", "#ec4899"],
+    tile: "bg-orange-50 text-orange-500",
   },
   {
     value: "OTHER",
     label: "Other",
     short: "Other",
-    gradient: "from-slate-700 via-indigo-600 to-violet-500",
-    // Same gradient as plain colors, for generated images.
-    hex: ["#334155", "#8b5cf6"],
-    glow: "rgb(99 102 241 / 0.45)",
+    gradient: "from-brand-900 to-purple-500",
+    hex: ["#8b5cf6", "#ec4899"],
+    tile: "bg-fuchsia-50 text-fuchsia-600",
   },
 ] as const;
 
@@ -76,6 +71,11 @@ export function naira(kobo: number) {
   }).format(kobo / 100);
 }
 
+/** Like naira(), but shows ₦0 instead of "Free" (for totals and revenue). */
+export function money(kobo: number) {
+  return naira(kobo).replace("Free", "₦0");
+}
+
 export function eventDate(d: Date | string) {
   return new Intl.DateTimeFormat("en-NG", {
     timeZone: TZ,
@@ -88,7 +88,7 @@ export function eventDate(d: Date | string) {
   }).format(new Date(d));
 }
 
-/** Pieces of a date for badges: { day: "12", month: "Nov", weekday: "Wed", time: "8:00 pm" }. */
+/** Pieces of a date: { day: "12", month: "Nov", weekday: "Wed", time: "8:00 pm", year: "2026" }. */
 export function dateParts(d: Date | string) {
   const date = new Date(d);
   const f = (o: Intl.DateTimeFormatOptions) =>
@@ -98,6 +98,7 @@ export function dateParts(d: Date | string) {
     month: f({ month: "short" }),
     weekday: f({ weekday: "short" }),
     time: f({ hour: "numeric", minute: "2-digit", hour12: true }),
+    year: f({ year: "numeric" }),
   };
 }
 
@@ -112,6 +113,36 @@ export function soonLabel(d: Date | string) {
   const diff = target.getTime() - now.getTime();
   if (diff > 0 && diff < 7 * 864e5) return "This week";
   return null;
+}
+
+/** "just now", "5m ago", "3h ago", "2d ago", or a date. */
+export function timeAgo(d: Date | string) {
+  const diff = Date.now() - new Date(d).getTime();
+  if (diff < 60e3) return "just now";
+  if (diff < 3600e3) return `${Math.floor(diff / 60e3)}m ago`;
+  if (diff < 864e5) return `${Math.floor(diff / 3600e3)}h ago`;
+  if (diff < 7 * 864e5) return `${Math.floor(diff / 864e5)}d ago`;
+  const p = dateParts(d);
+  return `${p.day} ${p.month}`;
+}
+
+/** Ticket availability across all of an event's ticket types. */
+export function availability(ticketTypes: readonly { quantity: number; sold: number }[]) {
+  const capacity = ticketTypes.reduce((n, t) => n + t.quantity, 0);
+  const left = ticketTypes.reduce((n, t) => n + Math.max(0, t.quantity - t.sold), 0);
+  const soldOut = left <= 0;
+  return { capacity, left, soldOut, sellingFast: !soldOut && (left <= 20 || left / capacity <= 0.2) };
+}
+
+/** Cheapest ticket price in kobo (0 = free). */
+export function lowestPrice(ticketTypes: readonly { priceKobo: number }[]) {
+  return ticketTypes.length ? Math.min(...ticketTypes.map((t) => t.priceKobo)) : 0;
+}
+
+/** True once an event is over (6 hours after it starts if it has no end time). */
+export function hasEnded(event: { startsAt: Date; endsAt: Date | null }) {
+  const end = event.endsAt?.getTime() ?? event.startsAt.getTime() + 6 * 3600e3;
+  return Date.now() > end;
 }
 
 export function slugify(s: string) {

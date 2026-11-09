@@ -1,72 +1,71 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------
-   Design tokens
+   EasyGate design tokens
+   Primary #6415F5 · Deep #3B0764 · Violet #A855F7 (purple-500)
+   Pink #EC4899 (pink-500) · Background #FAF9FF · Text #17152B / #777487
    --------------------------------------------------------------- */
 @theme inline {
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-jakarta);
+  --font-display: var(--font-jakarta);
   --font-mono: var(--font-geist-mono);
-  --font-display: var(--font-bricolage);
 }
 
 @theme {
-  --color-brand-50: #f3f0ff;
-  --color-brand-100: #e5deff;
-  --color-brand-200: #cdbfff;
-  --color-brand-300: #ad97ff;
-  --color-brand-400: #8c6dff;
-  --color-brand-500: #6d4aff;
-  --color-brand-600: #5a35f0;
-  --color-brand-700: #4824cc;
-  --color-brand-800: #3a1d9f;
-  --color-brand-900: #261470;
-  --color-ink: #14121f;
-  --color-page: #faf9fc;
-  --color-accent: #c6f432;
-  --color-hot: #ff4fa3;
-  --color-sun: #ff8a3d;
+  --color-brand-50: #f5f0ff;
+  --color-brand-100: #ebe1ff;
+  --color-brand-200: #d8c5fe;
+  --color-brand-300: #bb99fc;
+  --color-brand-400: #9b65f9;
+  --color-brand-500: #7d36f7;
+  --color-brand-600: #6415f5;
+  --color-brand-700: #5411d1;
+  --color-brand-800: #450da9;
+  --color-brand-900: #3b0764;
+  --color-ink: #17152b;
+  --color-muted: #777487;
+  --color-line: #ece8f5;
+  --color-page: #faf9ff;
+  --color-accent: #22c55e;
+  --color-hot: #ec4899;
+  --color-sun: #f59e0b;
 
-  /* Entrance animations use `backwards` fill so they never pin a transform
-     after finishing (hover effects keep working). */
-  --animate-fade-up: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
-  --animate-fade-in: fade-in 0.6s ease-out backwards;
-  --animate-page-in: page-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
-  --animate-pop: pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+  /* Entrance animations use `backwards` fill so they never pin a transform after finishing. */
+  --animate-fade-up: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  --animate-fade-in: fade-in 0.5s ease-out backwards;
+  --animate-page-in: page-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  --animate-pop: pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
   --animate-float: float 6s ease-in-out infinite;
-  --animate-blob: blob 18s ease-in-out infinite;
   --animate-gradient: gradient-pan 6s ease infinite;
   --animate-scan: scan 2.4s ease-in-out infinite;
   --animate-grow-x: grow-x 1.1s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
 :root {
-  --grad-brand: linear-gradient(120deg, #6d4aff 0%, #a63cf2 40%, #ff4fa3 72%, #ff8a3d 100%);
+  --grad-primary: linear-gradient(135deg, #6415f5 0%, #8a3cf7 55%, #a855f7 100%);
+  --grad-brand: linear-gradient(135deg, #6415f5 0%, #a855f7 55%, #ec4899 100%);
+  --shadow-card: 0 1px 2px rgb(59 7 100 / 0.04), 0 14px 34px -18px rgb(59 7 100 / 0.22);
 }
 
 /* ---------------------------------------------------------------
    Keyframes
    --------------------------------------------------------------- */
 @keyframes fade-up {
-  from { opacity: 0; transform: translateY(18px); }
+  from { opacity: 0; transform: translateY(14px); }
 }
 @keyframes fade-in {
   from { opacity: 0; }
 }
 @keyframes page-in {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(8px); }
 }
 @keyframes pop {
-  0% { opacity: 0; transform: scale(0.85); }
-  60% { opacity: 1; transform: scale(1.05); }
+  0% { opacity: 0; transform: scale(0.88); }
+  60% { opacity: 1; transform: scale(1.04); }
 }
 @keyframes float {
   0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); }
-  50% { transform: translateY(-14px) rotate(calc(var(--r, 0deg) + 6deg)); }
-}
-@keyframes blob {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(40px, -50px) scale(1.12); }
-  66% { transform: translate(-30px, 30px) scale(0.92); }
+  50% { transform: translateY(-10px) rotate(calc(var(--r, 0deg) + 3deg)); }
 }
 @keyframes gradient-pan {
   0%, 100% { background-position: 0% 50%; }
@@ -96,25 +95,25 @@
   }
   body {
     min-height: 100dvh;
-    background-color: #faf9fc;
+    background-color: #faf9ff;
+    /* The soft lavender disc in the top-right corner, plus a faint violet wash. */
     background-image:
-      radial-gradient(56rem 26rem at 0% -6rem, rgb(109 74 255 / 0.1), transparent 70%),
-      radial-gradient(44rem 22rem at 100% -4rem, rgb(255 79 163 / 0.08), transparent 70%);
+      radial-gradient(circle at calc(100% + 3rem) -4rem, #efe7ff 0, #efe7ff 15rem, transparent 15.06rem),
+      radial-gradient(42rem 26rem at 0% -4rem, rgb(100 21 245 / 0.07), transparent 70%);
     background-repeat: no-repeat;
-    color: #14121f;
+    color: #17152b;
   }
   h1,
   h2,
   h3 {
-    font-family: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
-    letter-spacing: -0.015em;
+    letter-spacing: -0.02em;
   }
   ::selection {
-    background: #e5deff;
-    color: #14121f;
+    background: #ebe1ff;
+    color: #17152b;
   }
   :focus-visible {
-    outline: 2px solid #6d4aff;
+    outline: 2px solid #6415f5;
     outline-offset: 2px;
   }
 }
@@ -125,16 +124,18 @@
 @layer components {
   .btn,
   .btn-primary,
-  .btn-ghost {
+  .btn-ghost,
+  .btn-soft,
+  .btn-white {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    border-radius: 0.875rem;
-    padding: 0.625rem 1rem;
+    border-radius: 9999px;
+    padding: 0.7rem 1.25rem;
     font-size: 0.875rem;
     line-height: 1.25rem;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     transition:
       transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
@@ -145,67 +146,73 @@
       color 0.2s ease,
       opacity 0.2s ease;
   }
-  /* Hover effects only on devices with a mouse, so they don't "stick" after a tap. */
-  @media (hover: hover) {
-    :is(.btn, .btn-primary, .btn-ghost):hover:not(:disabled) {
-      transform: translateY(-1px);
-    }
+  :is(.btn, .btn-primary, .btn-ghost, .btn-soft, .btn-white):active:not(:disabled) {
+    transform: scale(0.97);
   }
-  :is(.btn, .btn-primary, .btn-ghost):active:not(:disabled) {
-    transform: translateY(0) scale(0.97);
-  }
-  :is(.btn, .btn-primary, .btn-ghost):disabled {
+  :is(.btn, .btn-primary, .btn-ghost, .btn-soft, .btn-white):disabled {
     cursor: not-allowed;
     opacity: 0.5;
   }
 
   .btn-primary {
     color: #fff;
-    background-image: linear-gradient(120deg, #6d4aff 0%, #a63cf2 50%, #ff4fa3 100%);
+    background-image: var(--grad-primary);
     background-size: 160% 100%;
     background-position: 0% 50%;
     box-shadow:
-      0 10px 24px -10px rgb(109 74 255 / 0.65),
-      inset 0 1px 0 rgb(255 255 255 / 0.2);
+      0 10px 22px -10px rgb(100 21 245 / 0.7),
+      inset 0 1px 0 rgb(255 255 255 / 0.18);
   }
+  .btn-ghost {
+    background-color: #fff;
+    color: #17152b;
+    border: 1px solid #e6e1f3;
+    box-shadow: 0 1px 2px rgb(59 7 100 / 0.05);
+  }
+  .btn-soft {
+    background-color: #f5f0ff;
+    color: #5411d1;
+  }
+  .btn-white {
+    background-color: #fff;
+    color: #17152b;
+    box-shadow: 0 12px 26px -12px rgb(0 0 0 / 0.45);
+  }
+
+  /* Hover effects only on devices with a mouse, so they don't "stick" after a tap. */
   @media (hover: hover) {
+    :is(.btn, .btn-primary, .btn-ghost, .btn-soft, .btn-white):hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
     .btn-primary:hover:not(:disabled) {
       background-position: 100% 50%;
       box-shadow:
-        0 14px 30px -10px rgb(166 60 242 / 0.7),
-        inset 0 1px 0 rgb(255 255 255 / 0.25);
+        0 14px 28px -10px rgb(100 21 245 / 0.75),
+        inset 0 1px 0 rgb(255 255 255 / 0.22);
     }
-  }
-
-  .btn-ghost {
-    background-color: #fff;
-    color: #14121f;
-    border: 1px solid #e4e4e7;
-    box-shadow: 0 1px 2px rgb(20 18 31 / 0.04);
-  }
-  @media (hover: hover) {
     .btn-ghost:hover:not(:disabled) {
-      border-color: #cdbfff;
-      background-color: #f8f6ff;
-      color: #4824cc;
+      border-color: #d8c5fe;
+      background-color: #fbf9ff;
+      color: #5411d1;
+    }
+    .btn-soft:hover:not(:disabled) {
+      background-color: #ebe1ff;
     }
   }
 
   .card {
     border-radius: 1.5rem;
     background-color: #fff;
-    border: 1px solid rgb(228 228 231 / 0.7);
-    box-shadow:
-      0 1px 2px rgb(20 18 31 / 0.04),
-      0 10px 30px -14px rgb(20 18 31 / 0.1);
+    border: 1px solid #efebf8;
+    box-shadow: var(--shadow-card);
   }
 
   .input {
     width: 100%;
-    border-radius: 0.875rem;
-    border: 1px solid #e4e4e7;
+    border-radius: 1rem;
+    border: 1px solid #e6e1f3;
     background-color: #fff;
-    padding: 0.625rem 0.875rem;
+    padding: 0.7rem 1rem;
     /* 16px on phones: iOS zooms the page into any smaller text field. */
     font-size: 1rem;
     line-height: 1.5rem;
@@ -220,66 +227,69 @@
   }
   @media (hover: hover) {
     .input:hover {
-      border-color: #d4d4d8;
+      border-color: #d8c5fe;
     }
   }
   .input:focus {
-    border-color: #8c6dff;
-    box-shadow: 0 0 0 4px rgb(109 74 255 / 0.14);
+    border-color: #9b65f9;
+    box-shadow: 0 0 0 4px rgb(100 21 245 / 0.12);
   }
   .input::placeholder {
-    color: #a1a1aa;
+    color: #9d9aab;
   }
 
   .label {
     display: block;
     margin-bottom: 0.375rem;
     font-size: 0.875rem;
-    font-weight: 500;
-    color: #3f3f46;
+    font-weight: 600;
+    color: #4b4860;
   }
 }
 
 /* ---------------------------------------------------------------
-   Custom utilities (work with variants, e.g. group-hover:brand-gradient)
+   Custom utilities (work with variants, e.g. group-hover:primary-gradient)
    --------------------------------------------------------------- */
+@utility primary-gradient {
+  background-image: var(--grad-primary);
+}
 @utility brand-gradient {
   background-image: var(--grad-brand);
 }
-
+/* Deep purple stage with violet and pink light, used by the hero and dark panels. */
+@utility hero-surface {
+  background-color: #2a0650;
+  background-image:
+    radial-gradient(70% 60% at 85% 8%, rgb(168 85 247 / 0.55), transparent 70%),
+    radial-gradient(60% 50% at 8% 100%, rgb(236 72 153 / 0.22), transparent 70%),
+    linear-gradient(155deg, #26054a 0%, #3b0764 45%, #5512c9 100%);
+}
 @utility animated-gradient {
   background-size: 200% 200%;
   animation: gradient-pan 8s ease infinite;
 }
-
-/* Gradient text for light backgrounds */
 @utility gradient-text {
-  background-image: linear-gradient(100deg, #6d4aff 0%, #c03ce8 55%, #ff4fa3 100%);
+  background-image: linear-gradient(100deg, #6415f5 0%, #a855f7 60%, #ec4899 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
-
-/* Brighter gradient text for dark backgrounds */
 @utility gradient-text-light {
-  background-image: linear-gradient(100deg, #b49cff 0%, #ff7ac0 35%, #ffb36b 65%, #c6f432 100%);
+  background-image: linear-gradient(100deg, #c9b0ff 0%, #c084fc 45%, #f9a8d4 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
-
 @utility dot-pattern {
-  background-image: radial-gradient(rgb(255 255 255 / 0.35) 1px, transparent 1.5px);
+  background-image: radial-gradient(rgb(255 255 255 / 0.3) 1px, transparent 1.5px);
   background-size: 16px 16px;
 }
-
 @utility skeleton {
-  background-image: linear-gradient(90deg, #efedf5 0%, #f8f7fb 40%, #efedf5 80%);
+  background-image: linear-gradient(90deg, #f1edfa 0%, #f9f7fe 40%, #f1edfa 80%);
   background-size: 300% 100%;
   animation: shimmer 1.4s ease-in-out infinite;
 }
-
 @utility no-scrollbar {
   scrollbar-width: none;
   &::-webkit-scrollbar {
@@ -305,19 +315,9 @@
     radial-gradient(circle 12px at 0 0, #0000 97%, #000) left / 51% 100% no-repeat,
     radial-gradient(circle 12px at 100% 0, #0000 97%, #000) right / 51% 100% no-repeat;
 }
-/* Shadow that follows the notched ticket shape; lifts and glows on hover.
-   Set --glow on the element to tint the hover glow. */
+/* Shadow that follows the notched ticket shape. */
 @utility ticket-shadow {
-  filter: drop-shadow(0 1px 1px rgb(20 18 31 / 0.05)) drop-shadow(0 12px 22px rgb(20 18 31 / 0.08));
-  transition:
-    translate 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-    filter 0.35s ease;
-  @media (hover: hover) {
-    &:hover {
-      translate: 0 -6px;
-      filter: drop-shadow(0 2px 2px rgb(20 18 31 / 0.06)) drop-shadow(0 22px 30px var(--glow, rgb(109 74 255 / 0.35)));
-    }
-  }
+  filter: drop-shadow(0 1px 1px rgb(59 7 100 / 0.05)) drop-shadow(0 16px 26px rgb(59 7 100 / 0.14));
 }
 
 /* ---------------------------------------------------------------

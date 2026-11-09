@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { CrowdSilhouette, GateSilhouette } from "./Art";
 import { LockIcon, PartyIcon, TicketIcon, ZapIcon } from "./icons";
 
 const GOOGLE_ERRORS: Record<string, string> = {
@@ -53,33 +54,34 @@ export default function AuthForm({
   }
 
   return (
-    <div className="animate-fade-up mx-auto grid max-w-5xl overflow-hidden rounded-[2rem] bg-white shadow-[0_30px_80px_-30px_rgb(38_20_112/0.35)] ring-1 ring-zinc-200/60 lg:grid-cols-[1fr_1.05fr]">
+    <div className="animate-fade-up mx-auto grid max-w-5xl overflow-hidden rounded-[28px] bg-white shadow-[0_30px_80px_-30px_rgb(59_7_100/0.4)] ring-1 ring-line lg:grid-cols-[1fr_1.05fr]">
       {/* Brand panel (large screens) */}
-      <div className="brand-gradient animated-gradient relative hidden overflow-hidden p-10 text-white lg:flex lg:flex-col lg:justify-between">
-        <div aria-hidden className="dot-pattern absolute inset-0 opacity-30" />
-        <div aria-hidden className="absolute -right-20 -top-20 h-72 w-72 rounded-full border-[40px] border-white/10" />
+      <div className="hero-surface relative isolate hidden overflow-hidden p-10 text-white lg:flex lg:flex-col lg:justify-between">
+        <GateSilhouette className="absolute right-6 top-8 -z-10 h-40 w-56 text-white/[0.12]" />
+        <CrowdSilhouette className="absolute inset-x-0 bottom-0 -z-10 h-28 w-full text-[#12042a]/80" />
         <span
           aria-hidden
-          className="animate-float absolute right-10 top-10 grid h-16 w-16 place-items-center rounded-2xl bg-white/15 shadow-xl ring-1 ring-white/25 backdrop-blur-md"
+          className="animate-float absolute right-12 top-48 grid h-16 w-16 place-items-center rounded-2xl bg-white/15 shadow-xl ring-1 ring-white/25 backdrop-blur-md"
           style={{ "--r": "-12deg" } as React.CSSProperties}
         >
           <TicketIcon className="h-8 w-8" />
         </span>
         <span
           aria-hidden
-          className="animate-float absolute bottom-44 right-14 grid h-14 w-14 place-items-center rounded-2xl bg-white/15 shadow-xl ring-1 ring-white/25 backdrop-blur-md"
+          className="animate-float absolute bottom-48 right-24 grid h-14 w-14 place-items-center rounded-2xl bg-white/15 shadow-xl ring-1 ring-white/25 backdrop-blur-md"
           style={{ animationDelay: "-3s", "--r": "10deg" } as React.CSSProperties}
         >
           <PartyIcon className="h-7 w-7" />
         </span>
-        <div className="relative pt-16">
-          <p className="font-display text-4xl font-bold leading-tight">
+        <div className="relative pt-14">
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-brand-200">EasyGate</p>
+          <p className="mt-2 text-4xl font-extrabold leading-tight">
             {mode === "login" ? "Welcome back to the gate" : "Your OOU plans start here"}
           </p>
-          <p className="mt-3 max-w-sm text-white/85">
+          <p className="mt-3 max-w-sm text-white/80">
             {mode === "login"
               ? "Your tickets, your events, all in one place."
-              : "Join thousands of students who never miss a good event."}
+              : "Discover what's on at OOU and never miss a good event."}
           </p>
         </div>
         <ul className="relative space-y-3 text-sm font-medium">
