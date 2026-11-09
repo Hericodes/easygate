@@ -7,6 +7,7 @@ export function listUpcomingEvents(f: EventFilters) {
   return prisma.event.findMany({
     where: {
       published: true,
+      status: "APPROVED",
       startsAt: { gte: new Date(Date.now() - 6 * 60 * 60 * 1000) },
       ...(f.campus ? { campus: f.campus } : {}),
       ...(f.category ? { category: f.category } : {}),

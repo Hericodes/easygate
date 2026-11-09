@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, isAdmin } from "@/lib/auth";
 import { handleError, jsonError } from "@/lib/api";
 
 const schema = z.object({
@@ -21,7 +21,7 @@ export async function POST(req: Request) {
 
     const event = await prisma.event.findUnique({ where: { id: eventId } });
     if (!event) return jsonError("Event not found", 404);
-    if (event.organizerId !== user.id && user.role !== "ADMIN") {
+    if (event.organizerId !== user.id && !isAdmin(user)) {
       return jsonError("You can only check in guests for your own events", 403);
     }
 

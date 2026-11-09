@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 export default async function ScanPicker() {
   const user = await requireOrganizer();
   const events = await prisma.event.findMany({
-    where: { organizerId: user.id, startsAt: { gte: new Date(Date.now() - 24 * 3600e3) } },
+    where: { organizerId: user.id, status: "APPROVED", startsAt: { gte: new Date(Date.now() - 24 * 3600e3) } },
     orderBy: { startsAt: "asc" },
     include: { _count: { select: { tickets: true } } },
   });

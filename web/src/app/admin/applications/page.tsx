@@ -1,61 +1,65 @@
-import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
-import { eventDate } from "@/lib/format";
+import { requireAdmin } from "@/lib/admin";
+import { timeAgo } from "@/lib/format";
+import Avatar from "@/components/Avatar";
+import EmptyState from "@/components/EmptyState";
 import ReviewButtons from "@/components/ReviewButtons";
+import { SparklesIcon } from "@/components/icons";
 
 export const dynamic = "force-dynamic";
 
-const BADGE: Record<string, string> = {
-  PENDING: "bg-amber-50 text-amber-700",
-  APPROVED: "bg-emerald-50 text-emerald-700",
-  REJECTED: "bg-zinc-100 text-zinc-600",
+const BADGE: Record<string, [string, string]> = {
+  PENDING: ["bg-amber-50 text-amber-700", "Waiting"],
+  APPROVED: ["bg-emerald-50 text-emerald-700", "Approved"],
+  REJECTED: ["bg-zinc-100 text-zinc-600", "Not approved"],
 };
 
 export default async function ApplicationsPage() {
-  const user = await getCurrentUser();
-  if (!user) redirect("/login?next=/admin/applications");
-  if (user.role !== "ADMIN") notFound();
-
+  await requireAdmin("/admin/applications");
   const apps = await prisma.organizerApplication.findMany({
     include: { user: { select: { name: true, email: true } } },
     orderBy: [{ status: "desc" }, { createdAt: "desc" }], // PENDING sorts first
+    take: 100,
   });
-  const pending = apps.filter((a) => a.status === "PENDING").length;
+
+  if (apps.length === 0) {
+    return (
+      <EmptyState
+        icon={<SparklesIcon className="h-7 w-7" />}
+        title="No applications yet"
+        text="When students apply to become organizers, their applications appear here."
+      />
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Organizer applications</h1>
-        <p className="text-sm text-zinc-500">{pending} waiting for review</p>
-      </div>
-      {apps.length === 0 ? (
-        <div className="card p-10 text-center text-zinc-500">No applications yet.</div>
-      ) : (
-        <div className="space-y-3">
-          {apps.map((a) => (
-            <div key={a.id} className="card flex flex-wrap gap-4 p-5">
-              <div className="min-w-0 flex-1 space-y-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="font-semibold">{a.orgName}</p>
-                  <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${BADGE[a.status]}`}>
-                    {a.status.toLowerCase()}
-                  </span>
-                </div>
-                <p className="text-sm text-zinc-600">
-                  {a.user.name} · {a.user.email} · {a.phone}
-                  {a.socialHandle && ` · ${a.socialHandle}`}
-                </p>
-                <p className="text-sm"><span className="text-zinc-500">Events:</span> {a.eventTypes}</p>
-                {a.message && <p className="text-sm text-zinc-600">“{a.message}”</p>}
-                {a.reviewNote && <p className="text-sm text-zinc-500">Note: {a.reviewNote}</p>}
-                <p className="text-xs text-zinc-400">Applied {eventDate(a.createdAt)}</p>
+    <ul className="space-y-3">
+      {apps.map((a) => {
+        const [cls, label] = BADGE[a.status] ?? BADGE.PENDING;
+        return (
+          <li key={a.id} className="card animate-fade-up flex flex-wrap gap-4 p-4 sm:p-5">
+            <Avatar name={a.user.name} />
+            <div className="min-w-0 flex-1 space-y-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="text-lg font-extrabold text-ink">{a.orgName}</p>
+                <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${cls}`}>{label}</span>
               </div>
-              {a.status === "PENDING" && <ReviewButtons id={a.id} />}
+              <p className="text-sm text-muted">
+                {a.user.name} · {a.user.email} · {a.phone}
+                {a.socialHandle && ` · ${a.socialHandle}`}
+              </p>
+              <p className="text-sm text-ink">
+                <span className="text-muted">Plans to host: </span>
+                {a.eventTypes}
+              </p>
+              {a.message && <p className="rounded-xl bg-page px-3 py-2 text-sm text-ink/80 ring-1 ring-line">“{a.message}”</p>}
+              {a.reviewNote && <p className="text-sm text-muted">Reason given: {a.reviewNote}</p>}
+              <p className="text-xs text-muted">Applied {timeAgo(a.createdAt)}</p>
             </div>
-          ))}
-        </div>
-      )}
-    </div>
+            {a.status === "PENDING" && <ReviewButtons id={a.id} />}
+          </li>
+        );
+      })}
+    </ul>
   );
 }

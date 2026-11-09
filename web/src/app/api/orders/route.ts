@@ -35,7 +35,7 @@ export async function POST(req: Request) {
       where: { id: ticketTypeId },
       include: { event: true },
     });
-    if (!tt || !tt.event.published) return jsonError("Ticket not found", 404);
+    if (!tt || !tt.event.published || tt.event.status !== "APPROVED") return jsonError("Ticket not found", 404);
     if (tt.event.startsAt < new Date(Date.now() - 6 * 60 * 60 * 1000)) {
       return jsonError("This event has ended");
     }

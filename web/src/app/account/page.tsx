@@ -2,7 +2,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
-import { getCurrentUser, isOrganizer } from "@/lib/auth";
+import { getCurrentUser, isAdmin, isOrganizer, ROLE_LABEL } from "@/lib/auth";
 import { countUnread, SEEN_COOKIE } from "@/lib/notifications";
 import Avatar from "@/components/Avatar";
 import LogoutButton from "@/components/LogoutButton";
@@ -23,7 +23,6 @@ import {
 
 export const dynamic = "force-dynamic";
 
-const ROLE_LABEL: Record<string, string> = { STUDENT: "Student", ORGANIZER: "Organizer", ADMIN: "Admin" };
 
 export default async function AccountPage() {
   const session = await getCurrentUser();
@@ -78,8 +77,8 @@ export default async function AccountPage() {
         ) : (
           <MenuLink href="/organizers/apply" icon={<SparklesIcon className="h-5 w-5" />} title="Become an organizer" sub="Sell tickets for your events" />
         )}
-        {user.role === "ADMIN" && (
-          <MenuLink href="/admin/applications" icon={<ShieldCheckIcon className="h-5 w-5" />} title="Review applications" sub="Approve new organizers" />
+        {isAdmin(session) && (
+          <MenuLink href="/admin" icon={<ShieldCheckIcon className="h-5 w-5" />} title="Admin panel" sub="Review events, organizers, users and orders" />
         )}
       </nav>
 

@@ -26,7 +26,7 @@ export default async function CheckoutPage({
     where: { slug },
     include: { ticketTypes: { orderBy: { priceKobo: "asc" } } },
   });
-  if (!event || !event.published) notFound();
+  if (!event || !event.published || event.status !== "APPROVED") notFound();
 
   const types = event.ticketTypes.map((t) => ({
     id: t.id,

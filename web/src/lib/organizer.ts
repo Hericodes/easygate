@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { getCurrentUser, isOrganizer } from "./auth";
+import { getCurrentUser, isAdmin, isOrganizer } from "./auth";
 import { prisma } from "./db";
 
 /** For organizer pages: redirects visitors who aren't signed-in organizers. */
@@ -17,6 +17,6 @@ export async function requireOwnEvent(eventId: string) {
     where: { id: eventId },
     include: { ticketTypes: true },
   });
-  if (!event || (event.organizerId !== user.id && user.role !== "ADMIN")) notFound();
+  if (!event || (event.organizerId !== user.id && !isAdmin(user))) notFound();
   return { user, event };
 }

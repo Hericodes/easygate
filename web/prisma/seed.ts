@@ -19,7 +19,7 @@ async function main() {
       create: { email, name, role, campus: CAMPUS, passwordHash },
     });
 
-  await user("admin@easygate.test", "EasyGate Admin", "ADMIN");
+  await user("admin@easygate.test", "EasyGate Admin", "SUPER_ADMIN");
   const organizer = await user("organizer@easygate.test", "OOU Vibes Ent.", "ORGANIZER");
   await user("student@easygate.test", "Ada Student", "STUDENT");
   const applicant = await user("applicant@easygate.test", "Tunde Bakare", "STUDENT");
@@ -58,6 +58,8 @@ async function main() {
         campus: CAMPUS,
         venue: e.venue,
         startsAt: e.at,
+        status: "APPROVED",
+        reviewedAt: new Date(),
         organizerId: organizer.id,
         ticketTypes: {
           create: e.types.map(([name, price, quantity]) => ({ name, priceKobo: price * 100, quantity })),

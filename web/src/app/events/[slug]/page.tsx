@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, isAdmin } from "@/lib/auth";
 import { availability, categoryMeta, dateParts, lowestPrice, naira } from "@/lib/format";
 import Avatar from "@/components/Avatar";
 import CategoryIcon from "@/components/CategoryIcon";
@@ -10,7 +10,7 @@ import EventCover from "@/components/EventCover";
 import MobileBuyBar from "@/components/MobileBuyBar";
 import ShareButton from "@/components/ShareButton";
 import TicketOptions from "@/components/TicketOptions";
-import { CalendarIcon, ChevronLeftIcon, MapPinIcon, ShieldCheckIcon } from "@/components/icons";
+import { AlertIcon, CalendarIcon, ChevronLeftIcon, MapPinIcon, ShieldCheckIcon } from "@/components/icons";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +24,10 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
     getCurrentUser(),
   ]);
   if (!event || !event.published) notFound();
+  // Events waiting for review (or rejected) are only visible to their organizer and admins.
+  const approved = event.status === "APPROVED";
+  const canPreview = Boolean(user && (event.organizerId === user.id || isAdmin(user)));
+  if (!approved && !canPreview) notFound();
 
   const cat = categoryMeta(event.category);
   const start = dateParts(event.startsAt);
@@ -33,6 +37,17 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
 
   return (
     <div>
+      {!approved && (
+        <div className="mb-4 flex items-start gap-3 rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-900 ring-1 ring-amber-200">
+          <AlertIcon className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
+          <p>
+            <span className="font-bold">Preview only. </span>
+            {event.status === "PENDING"
+              ? "This event is waiting for admin review. Students can't see it or buy tickets yet."
+              : `This event wasn't approved${event.reviewNote ? `: ${event.reviewNote}` : "."} Students can't see it.`}
+          </p>
+        </div>
+      )}
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-8">
         <article className="min-w-0 space-y-5">
           {/* Cover */}
@@ -102,11 +117,18 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
           className="animate-fade-up scroll-mt-24 lg:sticky lg:top-24 lg:self-start"
           style={{ animationDelay: "120ms" }}
         >
-          <TicketOptions slug={event.slug} ticketTypes={event.ticketTypes} loggedIn={Boolean(user)} />
+          {approved ? (
+            <TicketOptions slug={event.slug} ticketTypes={event.ticketTypes} loggedIn={Boolean(user)} />
+          ) : (
+            <div className="card p-5 text-sm text-muted">
+              <h2 className="text-lg font-extrabold text-ink">Tickets</h2>
+              <p className="mt-1">Tickets go on sale as soon as an admin approves this event.</p>
+            </div>
+          )}
         </aside>
       </div>
 
-      {!soldOut && <MobileBuyBar targetId="tickets" label={price === 0 ? "Free entry" : `From ${naira(price)}`} />}
+      {approved && !soldOut && <MobileBuyBar targetId="tickets" label={price === 0 ? "Free entry" : `From ${naira(price)}`} />}
     </div>
   );
 }

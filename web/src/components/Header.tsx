@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { SessionUser } from "@/lib/auth";
-import { isOrganizer } from "@/lib/auth";
+import { isAdmin, isOrganizer } from "@/lib/auth";
 import Avatar from "./Avatar";
 import Logo from "./Logo";
 import NavLink from "./NavLink";
@@ -22,7 +22,7 @@ export default function Header({ user, unread }: { user: SessionUser | null; unr
           ) : (
             <NavLink href="/organizers/apply">Host an event</NavLink>
           )}
-          {user?.role === "ADMIN" && <NavLink href="/admin/applications">Applications</NavLink>}
+          {isAdmin(user) && <NavLink href="/admin">Admin</NavLink>}
         </nav>
 
         <div className="ml-auto flex items-center gap-2.5">

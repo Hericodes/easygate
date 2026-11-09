@@ -5,6 +5,7 @@ import { categoryMeta, eventDate, hasEnded, money } from "@/lib/format";
 import { CrowdSilhouette } from "@/components/Art";
 import EmptyState from "@/components/EmptyState";
 import EventCover from "@/components/EventCover";
+import EventStatusChip from "@/components/EventStatusChip";
 import StatTile from "@/components/StatTile";
 import {
   BanknoteIcon,
@@ -97,13 +98,7 @@ export default async function OrganizerDashboard() {
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-1.5">
                       <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${cat.tile}`}>{cat.label}</span>
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${
-                          ended ? "bg-zinc-100 text-zinc-600" : "bg-emerald-50 text-emerald-700"
-                        }`}
-                      >
-                        {ended ? "Ended" : "Upcoming"}
-                      </span>
+                      <EventStatusChip status={e.status} ended={ended} />
                     </div>
                     <p className="mt-1 line-clamp-2 font-bold text-ink transition-colors group-hover:text-brand-700">{e.title}</p>
                     <p className="text-sm text-muted">

@@ -1,5 +1,5 @@
 import { prisma } from "./db";
-import { isOrganizer, type SessionUser } from "./auth";
+import { isAdmin, isOrganizer, type SessionUser } from "./auth";
 import { dateParts, soonLabel } from "./format";
 
 /** Cookie holding when the user last opened the notifications page (ms timestamp). */
@@ -29,7 +29,8 @@ export async function getNotifications(user: SessionUser): Promise<Notice[]> {
   const now = Date.now();
   const organizer = isOrganizer(user);
 
-  const [tickets, pending, application, waiting, sales] = await Promise.all([
+  const admin = isAdmin(user);
+  const [tickets, pending, application, waiting, sales, eventsToReview, reviewedEvents] = await Promise.all([
     prisma.ticket.findMany({
       where: {
         userId: user.id,
@@ -51,7 +52,7 @@ export async function getNotifications(user: SessionUser): Promise<Notice[]> {
       take: 3,
     }),
     prisma.organizerApplication.findFirst({ where: { userId: user.id }, orderBy: { createdAt: "desc" } }),
-    user.role === "ADMIN"
+    admin
       ? prisma.organizerApplication.findMany({
           where: { status: "PENDING" },
           select: { createdAt: true },
@@ -62,6 +63,15 @@ export async function getNotifications(user: SessionUser): Promise<Notice[]> {
       ? prisma.ticket.findMany({
           where: { event: { organizerId: user.id }, createdAt: { gte: new Date(now - DAY) } },
           select: { createdAt: true, eventId: true, event: { select: { title: true } } },
+        })
+      : Promise.resolve([]),
+    admin
+      ? prisma.event.findMany({ where: { status: "PENDING" }, select: { createdAt: true }, orderBy: { createdAt: "desc" } })
+      : Promise.resolve([]),
+    organizer && !admin
+      ? prisma.event.findMany({
+          where: { organizerId: user.id, status: { in: ["APPROVED", "REJECTED"] }, reviewedAt: { gte: new Date(now - 14 * DAY) } },
+          select: { id: true, title: true, status: true, reviewNote: true, reviewedAt: true },
         })
       : Promise.resolve([]),
   ]);
@@ -109,14 +119,16 @@ export async function getNotifications(user: SessionUser): Promise<Notice[]> {
         at: application.createdAt,
       });
     } else if (application.status === "APPROVED") {
-      notes.push({
-        id: `application-${application.id}`,
-        kind: "organizer",
-        title: "You're now a verified organizer",
-        body: "Create your first event and start selling tickets.",
-        href: "/organizer/events/new",
-        at: reviewedAt,
-      });
+      if (!admin) {
+        notes.push({
+          id: `application-${application.id}`,
+          kind: "organizer",
+          title: "You're now a verified organizer",
+          body: "Create your first event and start selling tickets.",
+          href: "/organizer/events/new",
+          at: reviewedAt,
+        });
+      }
     } else {
       notes.push({
         id: `application-${application.id}`,
@@ -155,6 +167,33 @@ export async function getNotifications(user: SessionUser): Promise<Notice[]> {
       body: "In the last 24 hours. See who's coming in your dashboard.",
       href: `/organizer/events/${eventId}`,
       at: new Date(e.last),
+    });
+  }
+
+  if (eventsToReview.length) {
+    notes.push({
+      id: "admin-events",
+      kind: "admin",
+      title: `${eventsToReview.length} event${eventsToReview.length === 1 ? "" : "s"} waiting for review`,
+      body: "Check them before they go live to students.",
+      href: "/admin/events",
+      at: eventsToReview[0].createdAt,
+    });
+  }
+
+  for (const e of reviewedEvents) {
+    const approved = e.status === "APPROVED";
+    notes.push({
+      id: `event-review-${e.id}`,
+      kind: "organizer",
+      title: approved ? `${e.title} is live` : `${e.title} wasn't approved`,
+      body: approved
+        ? "Students can now see your event and buy tickets. Share the link!"
+        : e.reviewNote
+          ? `Reason: ${e.reviewNote}`
+          : "Contact the EasyGate team for details.",
+      href: `/organizer/events/${e.id}`,
+      at: e.reviewedAt ?? new Date(now),
     });
   }
 

@@ -7,7 +7,8 @@ import { XIcon } from "./icons";
 
 type TT = { name: string; priceNaira: string; quantity: string };
 
-export default function EventForm() {
+/** `autoApprove`: admins' events go live straight away; everyone else's wait for review. */
+export default function EventForm({ autoApprove = false }: { autoApprove?: boolean }) {
   const router = useRouter();
   const [ticketTypes, setTicketTypes] = useState<TT[]>([
     { name: "Regular", priceNaira: "2000", quantity: "100" },
@@ -126,7 +127,7 @@ export default function EventForm() {
 
       {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       <button disabled={loading} className="btn-primary w-full py-3">
-        {loading ? "Publishing…" : "Publish event"}
+        {loading ? "Submitting…" : autoApprove ? "Publish event" : "Submit event for review"}
       </button>
     </form>
   );

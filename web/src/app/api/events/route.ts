@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { getCurrentUser, isOrganizer } from "@/lib/auth";
+import { getCurrentUser, isAdmin, isOrganizer } from "@/lib/auth";
 import { handleError, jsonError } from "@/lib/api";
 import { listUpcomingEvents } from "@/lib/events";
 import { CATEGORIES, slugify } from "@/lib/format";
@@ -57,6 +57,8 @@ export async function POST(req: Request) {
         endsAt: data.endsAt,
         imageUrl: data.imageUrl || null,
         organizerId: user.id,
+        status: isAdmin(user) ? "APPROVED" : "PENDING",
+        reviewedAt: isAdmin(user) ? new Date() : null,
         ticketTypes: {
           create: data.ticketTypes.map((t) => ({
             name: t.name,

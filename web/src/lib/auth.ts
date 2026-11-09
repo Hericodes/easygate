@@ -62,6 +62,25 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
   }
 }
 
-export function isOrganizer(user: SessionUser | null) {
-  return user?.role === "ORGANIZER" || user?.role === "ADMIN";
+/**
+ * Roles: STUDENT < ORGANIZER < ADMIN < SUPER_ADMIN.
+ * Admins review events and organizers; only the super admin can make or remove admins.
+ */
+export const ROLE_LABEL: Record<string, string> = {
+  STUDENT: "Student",
+  ORGANIZER: "Organizer",
+  ADMIN: "Admin",
+  SUPER_ADMIN: "Super admin",
+};
+
+export function isSuperAdmin(user: { role: string } | null) {
+  return user?.role === "SUPER_ADMIN";
+}
+
+export function isAdmin(user: { role: string } | null) {
+  return user?.role === "ADMIN" || isSuperAdmin(user);
+}
+
+export function isOrganizer(user: { role: string } | null) {
+  return user?.role === "ORGANIZER" || isAdmin(user);
 }

@@ -11,6 +11,6 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
       organizer: { select: { name: true } },
     },
   });
-  if (!event || !event.published) return jsonError("Event not found", 404);
+  if (!event || !event.published || event.status !== "APPROVED") return jsonError("Event not found", 404);
   return NextResponse.json({ event });
 }

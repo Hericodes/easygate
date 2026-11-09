@@ -36,14 +36,21 @@ Demo accounts (password `password123`):
 | Student   | student@easygate.test     |
 | Student with a pending organizer application | applicant@easygate.test |
 
-## Who can create events
+## Roles and reviews
 
-Everyone signs up as a student and is logged in straight away. To sell tickets, a student applies at
-**/organizers/apply** (linked as "Host an event" in the header, on the sign-up page and in the footer).
-An admin reviews applications at **/admin/applications**. Approving one turns that account into an organizer.
+| Role | Can |
+| --- | --- |
+| Student | Browse events, buy tickets |
+| Organizer | Create events (after an admin approves their application), sell tickets, scan guests in |
+| Admin | Everything organizers can, plus the admin area: review events and organizer applications, change Student ↔ Organizer, look up orders |
+| Super admin | Everything admins can, plus add and remove admins |
 
-To make someone an admin, they sign up first, then run `npm run make-admin -- their@email.com`
-(with `DATABASE_URL` in `.env` pointing at the database you want to change).
+- Everyone signs up as a student. To sell tickets, a student applies at **/organizers/apply**; admins approve at **/admin/applications**.
+- **Every new event waits for review.** Organizers' events stay hidden until an admin approves them at **/admin/events**
+  (admins' own events go live straight away). Admins can also reject an event, or take a live one down, with a reason the organizer sees.
+- The admin area is at **/admin**: Overview, Events, Organizers, Users and Orders.
+- Admins are added by the super admin under **Admin → Users**. To create the first (super) admin, sign up, then run
+  `npm run make-admin -- their@email.com --super` with `DATABASE_URL` in `.env` pointing at the database you want to change.
 
 ## Deploying (GitHub + Vercel)
 

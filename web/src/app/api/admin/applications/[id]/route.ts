@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, isAdmin } from "@/lib/auth";
 import { handleError, jsonError } from "@/lib/api";
 
 const schema = z.object({
@@ -13,7 +13,7 @@ const schema = z.object({
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const admin = await getCurrentUser();
-    if (admin?.role !== "ADMIN") return jsonError("Admins only", 403);
+    if (!isAdmin(admin)) return jsonError("Admins only", 403);
     const { id } = await params;
     const { action, note } = schema.parse(await req.json());
 

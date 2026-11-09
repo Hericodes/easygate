@@ -16,7 +16,7 @@ model User {
   email        String   @unique
   passwordHash String? // null for accounts created with Google sign-in
   googleId     String?  @unique
-  role         String   @default("STUDENT") // STUDENT | ORGANIZER | ADMIN
+  role         String   @default("STUDENT") // STUDENT | ORGANIZER | ADMIN | SUPER_ADMIN
   campus       String?
   phone        String?
   createdAt    DateTime @default(now())
@@ -58,6 +58,10 @@ model Event {
   endsAt      DateTime?
   imageUrl    String?
   published   Boolean  @default(true)
+  // New events wait for an admin: PENDING | APPROVED | REJECTED. Only APPROVED events are public.
+  status      String    @default("PENDING")
+  reviewNote  String?
+  reviewedAt  DateTime?
   createdAt   DateTime @default(now())
 
   organizerId String
@@ -69,6 +73,7 @@ model Event {
 
   @@index([startsAt])
   @@index([campus])
+  @@index([status])
 }
 
 model TicketType {

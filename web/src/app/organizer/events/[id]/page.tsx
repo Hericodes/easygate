@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { requireOwnEvent } from "@/lib/organizer";
-import { eventDate, naira } from "@/lib/format";
+import { eventDate, hasEnded, naira } from "@/lib/format";
 import EventCover from "@/components/EventCover";
+import EventStatusChip from "@/components/EventStatusChip";
 import StatTile from "@/components/StatTile";
 import { BanknoteIcon, CheckIcon, ChevronLeftIcon, ScanIcon, TicketIcon } from "@/components/icons";
 
@@ -32,7 +33,8 @@ export default async function ManageEventPage({ params }: { params: Promise<{ id
             <EventCover title={event.title} category={event.category} imageUrl={event.imageUrl} size="sm" showTitle={false} />
           </div>
           <div className="min-w-0 flex-1">
-            <h1 className="text-xl font-extrabold leading-tight sm:text-2xl">{event.title}</h1>
+            <EventStatusChip status={event.status} ended={hasEnded(event)} />
+            <h1 className="mt-1 text-xl font-extrabold leading-tight sm:text-2xl">{event.title}</h1>
             <p className="mt-1 text-sm text-muted">
               {eventDate(event.startsAt)} · {event.venue}, {event.campus}
             </p>
@@ -44,6 +46,18 @@ export default async function ManageEventPage({ params }: { params: Promise<{ id
             </Link>
           </div>
         </section>
+        {event.status === "PENDING" && (
+          <p className="mt-3 rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-900 ring-1 ring-amber-200">
+            <span className="font-bold">Waiting for review. </span>
+            An EasyGate admin checks every new event before students can see it. You&apos;ll get a notification when it&apos;s live.
+          </p>
+        )}
+        {event.status === "REJECTED" && (
+          <p className="mt-3 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-800 ring-1 ring-red-200">
+            <span className="font-bold">Not approved. </span>
+            {event.reviewNote ?? "Contact the EasyGate team for details."}
+          </p>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
