@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import { prisma } from "@/lib/db";
 import { getCurrentUser, isAdmin } from "@/lib/auth";
+import { imageIdFromUrl } from "@/lib/images";
 import { availability, categoryMeta, dateParts, lowestPrice, naira } from "@/lib/format";
 import Avatar from "@/components/Avatar";
 import CategoryIcon from "@/components/CategoryIcon";
@@ -15,15 +18,47 @@ import { AlertIcon, CalendarIcon, ChevronLeftIcon, MapPinIcon, ShieldCheckIcon }
 
 export const dynamic = "force-dynamic";
 
+// Shared by the page and its link-preview details, so the event is only loaded once per request.
+const getEvent = cache((slug: string) =>
+  prisma.event.findUnique({
+    where: { slug },
+    include: { ticketTypes: { orderBy: { priceKobo: "asc" } }, organizer: { select: { name: true, avatarUrl: true } } },
+  }),
+);
+
+/** What WhatsApp, X, Facebook and others show when the event link is shared: title, when/where/price and the flyer. */
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const event = await getEvent(slug);
+  if (!event || !event.published || event.status !== "APPROVED") {
+    return { title: "Event · EasyGate", robots: { index: false } };
+  }
+  const d = dateParts(event.startsAt);
+  const price = lowestPrice(event.ticketTypes);
+  const description = `${d.weekday}, ${d.day} ${d.month} · ${d.time} at ${event.venue}. ${
+    price === 0 ? "Free entry" : `Tickets from ${naira(price)}`
+  } on EasyGate.`;
+  // The version changes when the flyer does, so apps fetch the new picture instead of a cached one.
+  const version = imageIdFromUrl(event.imageUrl) ?? (event.imageUrl ? "link" : "card");
+  const image = {
+    url: `/api/events/${event.slug}/share-image?v=${version}`,
+    width: 1200,
+    height: 630,
+    alt: event.imageUrl ? `${event.title} flyer` : event.title,
+    type: "image/jpeg",
+  };
+  return {
+    title: `${event.title} · EasyGate`,
+    description,
+    alternates: { canonical: `/events/${event.slug}` },
+    openGraph: { type: "website", siteName: "EasyGate", title: event.title, description, url: `/events/${event.slug}`, images: [image] },
+    twitter: { card: "summary_large_image", title: event.title, description, images: [image] },
+  };
+}
+
 export default async function EventPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const [event, user] = await Promise.all([
-    prisma.event.findUnique({
-      where: { slug },
-      include: { ticketTypes: { orderBy: { priceKobo: "asc" } }, organizer: { select: { name: true, avatarUrl: true } } },
-    }),
-    getCurrentUser(),
-  ]);
+  const [event, user] = await Promise.all([getEvent(slug), getCurrentUser()]);
   if (!event || !event.published) notFound();
   // Events waiting for review (or rejected) are only visible to their organizer and admins.
   const approved = event.status === "APPROVED";

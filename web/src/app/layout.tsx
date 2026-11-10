@@ -7,13 +7,17 @@ import { countUnread, SEEN_COOKIE } from "@/lib/notifications";
 import BottomNavigation from "@/components/BottomNavigation";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { siteUrl } from "@/lib/site";
 
 const jakarta = Plus_Jakarta_Sans({ variable: "--font-jakarta", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl()),
   title: "EasyGate: OOU events and tickets",
   description: "Discover parties, concerts and programs at Olabisi Onabanjo University and get your ticket in seconds.",
+  openGraph: { type: "website", siteName: "EasyGate", locale: "en_NG" },
+  twitter: { card: "summary_large_image" },
   applicationName: "EasyGate",
   appleWebApp: { capable: true, title: "EasyGate", statusBarStyle: "default" },
   formatDetection: { telephone: false },

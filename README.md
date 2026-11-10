@@ -110,6 +110,7 @@ If tickets sell out while someone is paying, the order is marked FAILED and need
 - **Ticket history** (`/tickets/history`): every order (paid, failed, not completed) with amount, date and payment reference, plus total spent, tickets bought and events attended.
 - **Profile** (`/account`): profile photo, ticket stats, your next event, name/email/phone, sign-in methods and password, log out.
 - **Flyers:** organizers upload the event flyer (no links). Students see the whole flyer on event cards and the event page, and can open it full screen.
+- **Link previews:** sharing an event link on WhatsApp, X, Facebook, Telegram or iMessage shows the flyer (or a branded card with the event details) plus the date, venue and price. The picture is made by `/api/events/:slug/share-image`.
 
 ## Pictures (flyers and profile photos)
 
