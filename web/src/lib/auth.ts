@@ -19,6 +19,7 @@ export type SessionUser = {
   email: string;
   role: string;
   campus: string | null;
+  avatarUrl: string | null;
 };
 
 export async function createToken(userId: string) {
@@ -55,7 +56,7 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
     if (!payload.sub) return null;
     return await prisma.user.findUnique({
       where: { id: payload.sub },
-      select: { id: true, name: true, email: true, role: true, campus: true },
+      select: { id: true, name: true, email: true, role: true, campus: true, avatarUrl: true },
     });
   } catch {
     return null;

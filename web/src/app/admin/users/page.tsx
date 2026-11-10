@@ -50,6 +50,7 @@ export default async function AdminUsers({
       name: true,
       email: true,
       role: true,
+      avatarUrl: true,
       createdAt: true,
       _count: { select: { tickets: true, events: true } },
     },
@@ -95,7 +96,7 @@ export default async function AdminUsers({
             const options = optionsFor(u);
             return (
               <li key={u.id} className="flex flex-wrap items-center gap-3 px-4 py-4 sm:px-5">
-                <Avatar name={u.name} />
+                <Avatar name={u.name} src={u.avatarUrl} />
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-1.5">
                     <p className="truncate font-bold text-ink">{u.name}</p>

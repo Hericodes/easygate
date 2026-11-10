@@ -44,7 +44,7 @@ export default function Header({ user, unread }: { user: SessionUser | null; unr
                 title="Your profile"
                 className="rounded-full transition active:scale-95"
               >
-                <Avatar name={user.name} online />
+                <Avatar name={user.name} src={user.avatarUrl} online />
               </Link>
             </>
           ) : (

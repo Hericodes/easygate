@@ -19,12 +19,31 @@ model User {
   role         String   @default("STUDENT") // STUDENT | ORGANIZER | ADMIN | SUPER_ADMIN
   campus       String?
   phone        String?
+  avatarUrl    String? // profile photo, e.g. /api/images/<id>
   createdAt    DateTime @default(now())
 
   events       Event[]                  @relation("OrganizerEvents")
   orders       Order[]
   tickets      Ticket[]
   applications OrganizerApplication[]
+  images       Image[]
+}
+
+// Uploaded pictures (event flyers and profile photos). They're resized in the browser
+// before upload and kept in the database, so no separate file storage is needed.
+// Served at /api/images/<id>.
+model Image {
+  id        String   @id @default(cuid())
+  kind      String // FLYER | AVATAR
+  mimeType  String // image/webp | image/jpeg | image/png
+  size      Int // bytes
+  data      Bytes
+  createdAt DateTime @default(now())
+
+  uploaderId String
+  uploader   User   @relation(fields: [uploaderId], references: [id], onDelete: Cascade)
+
+  @@index([uploaderId, kind])
 }
 
 // Students apply to become organizers; an admin approves or rejects.
@@ -56,7 +75,7 @@ model Event {
   venue       String
   startsAt    DateTime
   endsAt      DateTime?
-  imageUrl    String?
+  imageUrl    String? // flyer: /api/images/<id> (older events may have an outside link)
   published   Boolean  @default(true)
   // New events wait for an admin: PENDING | APPROVED | REJECTED. Only APPROVED events are public.
   status      String    @default("PENDING")

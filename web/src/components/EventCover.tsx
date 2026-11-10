@@ -1,5 +1,6 @@
 import { CrowdSilhouette } from "./Art";
 import CategoryIcon from "./CategoryIcon";
+import FlyerImage from "./FlyerImage";
 import { categoryMeta } from "@/lib/format";
 
 const TITLE_SIZE = { sm: "text-[11px]", md: "text-base", lg: "text-2xl" } as const;
@@ -7,6 +8,7 @@ const TITLE_SIZE = { sm: "text-[11px]", md: "text-base", lg: "text-2xl" } as con
 /**
  * An event's cover: the organiser's flyer if they added one, otherwise a generated
  * "stage" in the event type's colours with a crowd silhouette and the event name.
+ * Flyers are shown whole, except in small thumbnails (`size="sm"`), where they're cropped.
  * Fills its parent, so give the parent a size.
  */
 export default function EventCover({
@@ -15,16 +17,18 @@ export default function EventCover({
   imageUrl,
   size = "md",
   showTitle = true,
+  fit,
 }: {
   title: string;
   category: string;
   imageUrl?: string | null;
   size?: keyof typeof TITLE_SIZE;
   showTitle?: boolean;
+  /** How a flyer fills the frame. Defaults to `cover` for small thumbnails, `contain` otherwise. */
+  fit?: "contain" | "cover";
 }) {
   if (imageUrl) {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={imageUrl} alt="" loading="lazy" className="h-full w-full object-cover" />;
+    return <FlyerImage src={imageUrl} alt={`${title} flyer`} fit={fit ?? (size === "sm" ? "cover" : "contain")} />;
   }
 
   const [c1, c2] = categoryMeta(category).hex;

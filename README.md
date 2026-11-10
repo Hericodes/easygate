@@ -108,7 +108,19 @@ If tickets sell out while someone is paying, the order is marked FAILED and need
 - **Organizer dashboard:** sales, revenue, check-in counts and attendee list per event.
 - **Organizer applications:** students apply and admins approve or reject them.
 - **Ticket history** (`/tickets/history`): every order (paid, failed, not completed) with amount, date and payment reference, plus total spent, tickets bought and events attended.
-- **Account** (`/account`): edit name, email and phone, change password, log out.
+- **Profile** (`/account`): profile photo, ticket stats, your next event, name/email/phone, sign-in methods and password, log out.
+- **Flyers:** organizers upload the event flyer (no links). Students see the whole flyer on event cards and the event page, and can open it full screen.
+
+## Pictures (flyers and profile photos)
+
+Pictures are shrunk in the browser before upload (flyers to 1600 px, profile photos to a 512 px square, as WebP),
+so each is usually under 400 KB. They're stored in the database (`Image` table) and served at `/api/images/:id` with a one-year cache,
+so Vercel's CDN serves repeat views without touching the database. Only JPEG, PNG and WebP are accepted (checked from the file
+itself), up to 3 MB, and at most 40 uploads per account per hour. Flyers that were uploaded but never used on an event are
+deleted after a day; a replaced profile photo is deleted straight away.
+
+Neon's free plan has 0.5 GB of storage, roughly 1,500 or more flyers. If you outgrow it, move pictures to
+Vercel Blob or Cloudinary; only `src/lib/images.ts` and `/api/images/:id` need to change.
 
 ## API (for the mobile app)
 
@@ -121,7 +133,10 @@ Login and signup return a `token`. Send it as `Authorization: Bearer <token>`. T
 | GET    | /api/auth/me                 | anyone    | current user or null                                 |
 | GET    | /api/events                  | anyone    | `?q=&category=`                                      |
 | GET    | /api/events/:slug            | anyone    | event + ticket types                                 |
-| POST   | /api/events                  | organizer | create event with `ticketTypes[]`                    |
+| POST   | /api/events                  | organizer | create event with `ticketTypes[]` and optional `imageUrl` (from /api/uploads) |
+| POST   | /api/uploads                 | organizer | multipart `file` (flyer) → `{url}`                   |
+| GET    | /api/images/:id              | anyone    | an uploaded picture                                  |
+| POST   | /api/account/avatar          | logged in | multipart `file` → `{avatarUrl}`; DELETE removes it  |
 | POST   | /api/orders                  | logged in | `{ticketTypeId,quantity}` → `{redirectUrl}`          |
 | GET    | /api/orders                  | logged in | my order history + summary totals                    |
 | GET    | /api/tickets                 | logged in | my tickets with QR data URLs                         |
@@ -136,5 +151,4 @@ Login and signup return a `token`. Send it as `Authorization: Bearer <token>`. T
 
 - Emailing tickets to buyers, and notifying applicants when they're approved
 - Editing or cancelling events after publishing; organizer payouts (Paystack subaccounts)
-- Image upload for flyers (currently a link)
 - The mobile app

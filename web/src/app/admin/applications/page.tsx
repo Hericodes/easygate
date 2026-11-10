@@ -18,7 +18,7 @@ const BADGE: Record<string, [string, string]> = {
 export default async function ApplicationsPage() {
   await requireAdmin("/admin/applications");
   const apps = await prisma.organizerApplication.findMany({
-    include: { user: { select: { name: true, email: true, role: true } } },
+    include: { user: { select: { name: true, email: true, role: true, avatarUrl: true } } },
     orderBy: [{ status: "desc" }, { createdAt: "desc" }], // PENDING sorts first
     take: 100,
   });
@@ -39,7 +39,7 @@ export default async function ApplicationsPage() {
         const [cls, label] = BADGE[a.status] ?? BADGE.PENDING;
         return (
           <li key={a.id} className="card animate-fade-up flex flex-wrap gap-4 p-4 sm:p-5">
-            <Avatar name={a.user.name} />
+            <Avatar name={a.user.name} src={a.user.avatarUrl} />
             <div className="min-w-0 flex-1 space-y-1">
               <div className="flex flex-wrap items-center gap-2">
                 <p className="text-lg font-extrabold text-ink">{a.orgName}</p>

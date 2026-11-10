@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CATEGORIES } from "@/lib/format";
+import FlyerUpload from "./FlyerUpload";
 import { XIcon } from "./icons";
 
 type TT = { name: string; priceNaira: string; quantity: string };
@@ -15,6 +16,7 @@ export default function EventForm({ autoApprove = false }: { autoApprove?: boole
   ]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   function updateTT(i: number, patch: Partial<TT>) {
     setTicketTypes((list) => list.map((t, j) => (j === i ? { ...t, ...patch } : t)));
@@ -22,6 +24,7 @@ export default function EventForm({ autoApprove = false }: { autoApprove?: boole
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (uploading) return;
     setError("");
     setLoading(true);
     const f = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
@@ -45,6 +48,12 @@ export default function EventForm({ autoApprove = false }: { autoApprove?: boole
 
   return (
     <form onSubmit={onSubmit} className="space-y-6">
+      <section className="card p-5 sm:p-6">
+        <h2 className="font-bold">Event flyer</h2>
+        <p className="mb-4 mt-0.5 text-sm text-muted">Optional. Without one, your event gets a cover in its type&apos;s colours.</p>
+        <FlyerUpload onBusy={setUploading} />
+      </section>
+
       <section className="card space-y-4 p-6">
         <div>
           <label className="label" htmlFor="title">Event name</label>
@@ -74,10 +83,6 @@ export default function EventForm({ autoApprove = false }: { autoApprove?: boole
           <div>
             <label className="label" htmlFor="endsAt">Ends (optional)</label>
             <input id="endsAt" name="endsAt" type="datetime-local" className="input" />
-          </div>
-          <div className="sm:col-span-2">
-            <label className="label" htmlFor="imageUrl">Flyer image link (optional)</label>
-            <input id="imageUrl" name="imageUrl" type="url" className="input" placeholder="https://…" />
           </div>
         </div>
       </section>
@@ -126,8 +131,8 @@ export default function EventForm({ autoApprove = false }: { autoApprove?: boole
       </section>
 
       {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
-      <button disabled={loading} className="btn-primary w-full py-3">
-        {loading ? "Submitting…" : autoApprove ? "Publish event" : "Submit event for review"}
+      <button disabled={loading || uploading} className="btn-primary w-full py-3">
+        {uploading ? "Waiting for the flyer…" : loading ? "Submitting…" : autoApprove ? "Publish event" : "Submit event for review"}
       </button>
     </form>
   );

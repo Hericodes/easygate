@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 export default async function Home() {
   const [user, events] = await Promise.all([getCurrentUser(), listUpcomingEvents({})]);
   const organizer = isOrganizer(user);
-  const upcoming = events.slice(0, 6);
+  const upcoming = events.slice(0, 8);
 
   return (
     <div className="space-y-7 sm:space-y-10">

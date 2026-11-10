@@ -6,6 +6,7 @@ import { handleError, jsonError } from "@/lib/api";
 import { listUpcomingEvents } from "@/lib/events";
 import { CATEGORIES, slugify } from "@/lib/format";
 import { CAMPUS } from "@/lib/campus";
+import { ownsFlyer } from "@/lib/images";
 
 export async function GET(req: Request) {
   const sp = new URL(req.url).searchParams;
@@ -24,7 +25,8 @@ const createSchema = z.object({
   venue: z.string().trim().min(2, "Enter the venue"),
   startsAt: z.coerce.date(),
   endsAt: z.coerce.date().optional(),
-  imageUrl: z.string().trim().url("Image must be a link").optional().or(z.literal("")),
+  // A flyer uploaded first with POST /api/uploads.
+  imageUrl: z.string().trim().max(200).optional().or(z.literal("")),
   ticketTypes: z
     .array(
       z.object({
@@ -44,6 +46,10 @@ export async function POST(req: Request) {
 
     const data = createSchema.parse(await req.json());
     if (data.startsAt < new Date()) return jsonError("Event must start in the future");
+    if (data.endsAt && data.endsAt <= data.startsAt) return jsonError("The event must end after it starts");
+    if (data.imageUrl && !(await ownsFlyer(user.id, data.imageUrl))) {
+      return jsonError("Upload the flyer again, then submit");
+    }
 
     const event = await prisma.event.create({
       data: {

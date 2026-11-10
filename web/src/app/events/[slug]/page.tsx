@@ -7,6 +7,7 @@ import Avatar from "@/components/Avatar";
 import CategoryIcon from "@/components/CategoryIcon";
 import Countdown from "@/components/Countdown";
 import EventCover from "@/components/EventCover";
+import FlyerViewer from "@/components/FlyerViewer";
 import MobileBuyBar from "@/components/MobileBuyBar";
 import ShareButton from "@/components/ShareButton";
 import TicketOptions from "@/components/TicketOptions";
@@ -19,7 +20,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
   const [event, user] = await Promise.all([
     prisma.event.findUnique({
       where: { slug },
-      include: { ticketTypes: { orderBy: { priceKobo: "asc" } }, organizer: { select: { name: true } } },
+      include: { ticketTypes: { orderBy: { priceKobo: "asc" } }, organizer: { select: { name: true, avatarUrl: true } } },
     }),
     getCurrentUser(),
   ]);
@@ -52,10 +53,27 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
         <article className="min-w-0 space-y-5">
           {/* Cover */}
           <div className="animate-fade-in relative -mx-4 -mt-2 overflow-hidden sm:mx-0 sm:mt-0 sm:rounded-[28px]">
-            <div className="relative h-[270px] sm:h-[380px]">
-              <EventCover title={event.title} category={event.category} imageUrl={event.imageUrl} size="lg" showTitle={false} />
-              <div aria-hidden className="absolute inset-0 bg-linear-to-b from-black/35 via-transparent to-black/25" />
-            </div>
+            {event.imageUrl ? (
+              // The flyer as a poster on a blurred copy of itself, clear of the card that overlaps the bottom.
+              <div className="relative h-[460px] bg-[#150833] sm:h-[540px]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={event.imageUrl}
+                  alt=""
+                  aria-hidden
+                  className="absolute inset-0 h-full w-full scale-125 object-cover opacity-70 blur-3xl saturate-150"
+                />
+                <div aria-hidden className="absolute inset-0 bg-linear-to-b from-black/45 via-black/10 to-black/40" />
+                <div className="absolute inset-x-5 bottom-[4.5rem] top-[4.25rem] flex justify-center sm:bottom-24 sm:top-16">
+                  <FlyerViewer src={event.imageUrl} title={event.title} />
+                </div>
+              </div>
+            ) : (
+              <div className="relative h-[270px] sm:h-[380px]">
+                <EventCover title={event.title} category={event.category} size="lg" showTitle={false} />
+                <div aria-hidden className="absolute inset-0 bg-linear-to-b from-black/35 via-transparent to-black/25" />
+              </div>
+            )}
             <div className="absolute inset-x-0 top-0 flex items-center justify-between p-4">
               <Link
                 href="/events"
@@ -95,7 +113,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
             </div>
 
             <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-line pt-5">
-              <Avatar name={event.organizer.name} />
+              <Avatar name={event.organizer.name} src={event.organizer.avatarUrl} />
               <div className="min-w-0">
                 <p className="text-xs text-muted">Organized by</p>
                 <p className="truncate font-bold text-ink">{event.organizer.name}</p>
