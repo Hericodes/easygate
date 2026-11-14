@@ -140,7 +140,7 @@ export default function Scanner({ eventId }: { eventId: string }) {
         <input
           value={manual}
           onChange={(e) => setManual(e.target.value)}
-          placeholder="EG-XXXXXXXXXX"
+          placeholder="JV-XXXXXXXXXX"
           aria-label="Ticket code"
           className="input font-mono uppercase"
         />

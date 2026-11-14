@@ -30,7 +30,7 @@ export default function QRCodeTicket({
       <div className="ticket-top hero-surface relative overflow-hidden rounded-t-[28px] px-6 pb-8 pt-6 text-white">
         <CrowdSilhouette className="absolute inset-x-0 bottom-0 h-16 w-full text-[#12042a]/60" />
         <div className="relative flex items-center justify-between text-[11px] font-bold uppercase tracking-[0.2em] text-white/70">
-          <span>EasyGate · Admit one</span>
+          <span>Jiivent · Admit one</span>
           <TicketIcon className="h-5 w-5" />
         </div>
         <h1 className="relative mt-3 text-2xl font-extrabold leading-tight">{event.title}</h1>

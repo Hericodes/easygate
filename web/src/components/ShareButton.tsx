@@ -11,7 +11,7 @@ export default function ShareButton({ title }: { title: string }) {
     const url = window.location.href;
     if (navigator.share) {
       try {
-        await navigator.share({ title, text: `${title} on EasyGate`, url });
+        await navigator.share({ title, text: `${title} on Jiivent`, url });
       } catch {
         /* the user closed the share sheet */
       }

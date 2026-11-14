@@ -14,12 +14,12 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
-  title: "EasyGate: OOU events and tickets",
+  title: "Jiivent: OOU events and tickets",
   description: "Discover parties, concerts and programs at Olabisi Onabanjo University and get your ticket in seconds.",
-  openGraph: { type: "website", siteName: "EasyGate", locale: "en_NG" },
+  openGraph: { type: "website", siteName: "Jiivent", locale: "en_NG" },
   twitter: { card: "summary_large_image" },
-  applicationName: "EasyGate",
-  appleWebApp: { capable: true, title: "EasyGate", statusBarStyle: "default" },
+  applicationName: "Jiivent",
+  appleWebApp: { capable: true, title: "Jiivent", statusBarStyle: "default" },
   formatDetection: { telephone: false },
 };
 

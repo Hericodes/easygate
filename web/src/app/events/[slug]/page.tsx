@@ -31,13 +31,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const event = await getEvent(slug);
   if (!event || !event.published || event.status !== "APPROVED") {
-    return { title: "Event · EasyGate", robots: { index: false } };
+    return { title: "Event · Jiivent", robots: { index: false } };
   }
   const d = dateParts(event.startsAt);
   const price = lowestPrice(event.ticketTypes);
   const description = `${d.weekday}, ${d.day} ${d.month} · ${d.time} at ${event.venue}. ${
     price === 0 ? "Free entry" : `Tickets from ${naira(price)}`
-  } on EasyGate.`;
+  } on Jiivent.`;
   // The version changes when the flyer does, so apps fetch the new picture instead of a cached one.
   const version = imageIdFromUrl(event.imageUrl) ?? (event.imageUrl ? "link" : "card");
   const image = {
@@ -48,10 +48,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     type: "image/jpeg",
   };
   return {
-    title: `${event.title} · EasyGate`,
+    title: `${event.title} · Jiivent`,
     description,
     alternates: { canonical: `/events/${event.slug}` },
-    openGraph: { type: "website", siteName: "EasyGate", title: event.title, description, url: `/events/${event.slug}`, images: [image] },
+    openGraph: { type: "website", siteName: "Jiivent", title: event.title, description, url: `/events/${event.slug}`, images: [image] },
     twitter: { card: "summary_large_image", title: event.title, description, images: [image] },
   };
 }

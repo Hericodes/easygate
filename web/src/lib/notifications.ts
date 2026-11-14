@@ -191,7 +191,7 @@ export async function getNotifications(user: SessionUser): Promise<Notice[]> {
         ? "Students can now see your event and buy tickets. Share the link!"
         : e.reviewNote
           ? `Reason: ${e.reviewNote}`
-          : "Contact the EasyGate team for details.",
+          : "Contact the Jiivent team for details.",
       href: `/organizer/events/${e.id}`,
       at: e.reviewedAt ?? new Date(now),
     });

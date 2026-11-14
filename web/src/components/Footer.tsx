@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="flex items-center gap-2.5">
           <LogoMark size="sm" />
           <p>
-            © {new Date().getFullYear()} <span className="font-bold text-ink">EasyGate</span> · Built for OOU
+            © {new Date().getFullYear()} <span className="font-bold text-ink">Jiivent</span> · Built for OOU
           </p>
         </div>
         <nav aria-label="Footer" className="flex flex-wrap gap-x-5">

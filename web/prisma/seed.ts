@@ -19,7 +19,7 @@ async function main() {
       create: { email, name, role, campus: CAMPUS, passwordHash },
     });
 
-  await user("admin@easygate.test", "EasyGate Admin", "SUPER_ADMIN");
+  await user("admin@easygate.test", "Jiivent Admin", "SUPER_ADMIN");
   const organizer = await user("organizer@easygate.test", "OOU Vibes Ent.", "ORGANIZER");
   await user("student@easygate.test", "Ada Student", "STUDENT");
   const applicant = await user("applicant@easygate.test", "Tunde Bakare", "STUDENT");
@@ -53,7 +53,7 @@ async function main() {
       data: {
         slug: e.title.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + i,
         title: e.title,
-        description: `${e.title} is here! Join OOU students for an unforgettable time.\n\nGates open one hour before start. Bring your student ID and your EasyGate QR ticket.`,
+        description: `${e.title} is here! Join OOU students for an unforgettable time.\n\nGates open one hour before start. Bring your student ID and your Jiivent QR ticket.`,
         category: e.category,
         campus: CAMPUS,
         venue: e.venue,

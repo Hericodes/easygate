@@ -44,7 +44,7 @@ export default async function TicketPage({ params }: { params: Promise<{ code: s
 
       <div className="grid grid-cols-2 gap-3">
         {valid && (
-          <a href={`/api/tickets/${ticket.code}/image`} download={`EasyGate-${ticket.code}.png`} className="btn-primary py-3">
+          <a href={`/api/tickets/${ticket.code}/image`} download={`Jiivent-${ticket.code}.png`} className="btn-primary py-3">
             <DownloadIcon className="h-4 w-4" /> Save to phone
           </a>
         )}

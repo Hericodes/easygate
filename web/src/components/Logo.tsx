@@ -15,13 +15,13 @@ export function LogoMark({ size = "md" }: { size?: "sm" | "md" }) {
 /** Logo tile, wordmark and tagline, linking home. */
 export default function Logo() {
   return (
-    <Link href="/" aria-label="EasyGate home" className="group flex items-center gap-2.5">
+    <Link href="/" aria-label="Jiivent home" className="group flex items-center gap-2.5">
       <span className="transition duration-300 group-hover:-rotate-6">
         <LogoMark />
       </span>
       <span className="leading-none">
         <span className="block text-[21px] font-extrabold tracking-tight text-ink">
-          Easy<span className="text-brand-600">Gate</span>
+          Jii<span className="text-brand-600">vent</span>
         </span>
         <span className="mt-1 block text-[11px] font-medium text-muted">Events. Tickets. Memories.</span>
       </span>

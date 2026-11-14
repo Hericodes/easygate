@@ -98,7 +98,7 @@ const BADGE_W = 230;
 const BADGE_H = 56;
 let badgePromise: Promise<Buffer> | null = null;
 
-/** The small "EasyGate" pill as a transparent PNG (the same for every event, so it's made once). */
+/** The small "Jiivent" pill as a transparent PNG (the same for every event, so it's made once). */
 function badge(): Promise<Buffer> {
   badgePromise ??= (async () => {
     const fonts = await loadFonts();
@@ -113,7 +113,7 @@ function badge(): Promise<Buffer> {
             fontFamily: fonts.length ? "Jakarta" : undefined,
           }}
         >
-          <Brand label="EasyGate" small />
+          <Brand label="Jiivent" small />
         </div>
       ),
       { width: BADGE_W, height: BADGE_H, fonts: fonts.length ? fonts : undefined },
@@ -290,8 +290,8 @@ async function detailsCard(event: {
   return sharp(Buffer.from(await image.arrayBuffer())).jpeg({ quality: 82 }).toBuffer();
 }
 
-/** The EasyGate badge: ticket mark plus a label. */
-function Brand({ label = "Tickets on EasyGate", small = false }: { label?: string; small?: boolean }) {
+/** The Jiivent badge: ticket mark plus a label. */
+function Brand({ label = "Tickets on Jiivent", small = false }: { label?: string; small?: boolean }) {
   const mark = small ? 38 : 44;
   return (
     <div

@@ -74,7 +74,7 @@ export default function AuthForm({
           <PartyIcon className="h-7 w-7" />
         </span>
         <div className="relative pt-14">
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-brand-200">EasyGate</p>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-brand-200">Jiivent</p>
           <p className="mt-2 text-4xl font-extrabold leading-tight">
             {mode === "login" ? "Welcome back to the gate" : "Your OOU plans start here"}
           </p>

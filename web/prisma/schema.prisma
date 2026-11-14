@@ -1,4 +1,4 @@
-// EasyGate data model (PostgreSQL, e.g. Neon).
+// Jiivent data model (PostgreSQL, e.g. Neon).
 
 generator client {
   provider = "prisma-client-js"

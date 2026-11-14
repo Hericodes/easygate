@@ -116,7 +116,7 @@ export default async function AccountPage() {
           <div className="absolute inset-x-0 bottom-0 h-px bg-linear-to-r from-transparent via-white/30 to-transparent" />
           <div className="absolute left-5 top-4 flex items-center gap-2 sm:left-8 sm:top-6">
             <LogoMark size="sm" />
-            <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/75">EasyGate member</span>
+            <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/75">Jiivent member</span>
           </div>
         </div>
 
@@ -220,7 +220,7 @@ export default async function AccountPage() {
           </section>
 
           <section id="settings" className="card animate-fade-up scroll-mt-24 p-5 sm:p-7" style={{ animationDelay: "180ms" }}>
-            <SectionTitle icon={<LockIcon className="h-5 w-5" />} title="Sign-in & security" sub="How you log in to EasyGate." />
+            <SectionTitle icon={<LockIcon className="h-5 w-5" />} title="Sign-in & security" sub="How you log in to Jiivent." />
 
             <ul className="mb-6 divide-y divide-line rounded-2xl ring-1 ring-line">
               <SignInMethod
@@ -371,7 +371,7 @@ function BecomeOrganizerCard() {
       <div aria-hidden className="absolute -right-10 -top-10 -z-10 h-40 w-40 rounded-full bg-pink-500/30 blur-3xl" />
       <SparklesIcon className="h-6 w-6 text-brand-200" />
       <p className="mt-3 text-lg font-extrabold leading-snug">Hosting an event at OOU?</p>
-      <p className="mt-1 text-sm text-white/70">Apply to become an organizer and sell tickets on EasyGate.</p>
+      <p className="mt-1 text-sm text-white/70">Apply to become an organizer and sell tickets on Jiivent.</p>
       <Link href="/organizers/apply" className="btn-white mt-4 h-10 w-full text-sm">
         Become an organizer
       </Link>

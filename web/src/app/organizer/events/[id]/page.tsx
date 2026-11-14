@@ -49,13 +49,13 @@ export default async function ManageEventPage({ params }: { params: Promise<{ id
         {event.status === "PENDING" && (
           <p className="mt-3 rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-900 ring-1 ring-amber-200">
             <span className="font-bold">Waiting for review. </span>
-            An EasyGate admin checks every new event before students can see it. You&apos;ll get a notification when it&apos;s live.
+            An Jiivent admin checks every new event before students can see it. You&apos;ll get a notification when it&apos;s live.
           </p>
         )}
         {event.status === "REJECTED" && (
           <p className="mt-3 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-800 ring-1 ring-red-200">
             <span className="font-bold">Not approved. </span>
-            {event.reviewNote ?? "Contact the EasyGate team for details."}
+            {event.reviewNote ?? "Contact the Jiivent team for details."}
           </p>
         )}
       </div>

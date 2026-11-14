@@ -1,4 +1,4 @@
-# EasyGate
+# Jiivent
 
 Students at **OOU (Olabisi Onabanjo University)** discover campus events (parties, concerts, programs) and get their tickets in seconds.
 Verified organizers create events, sell tickets through Paystack, and scan guests in at the door.
@@ -6,7 +6,7 @@ Verified organizers create events, sell tickets through Paystack, and scan guest
 The campus is set in `web/src/lib/campus.ts`, so adding schools later is a small change.
 
 ```
-EasyGate/
+Jiivent/
 ├── web/      Next.js website + REST API (used by the web app and the future mobile app)
 └── mobile/   (next) Expo React Native app using the same API
 ```
@@ -65,7 +65,7 @@ Demo accounts (password `password123`):
    | `AUTH_SECRET` | A new long random string, 32+ characters (not the dev one). The build refuses to deploy without it |
    | `PAYSTACK_SECRET_KEY` | `sk_test_…` to test payments, `sk_live_…` for real money |
    | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Same as local (optional) |
-   | `APP_URL` | Optional, e.g. `https://easygate.vercel.app` |
+   | `APP_URL` | Optional, e.g. `https://jiivent.vercel.app` |
 
 4. Deploy. Every deploy runs `npm run vercel-build`, which applies database migrations, then builds.
 5. After the first deploy:
@@ -81,7 +81,7 @@ create the Neon database in the same region (AWS Europe Central / Frankfurt).
 "Continue with Google" appears on the login and sign-up pages once these are set in `web/.env`:
 
 1. Open [Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials) and create a project if you don't have one.
-2. Set up the **OAuth consent screen**: External, app name "EasyGate", your support email.
+2. Set up the **OAuth consent screen**: External, app name "Jiivent", your support email.
 3. **Create credentials → OAuth client ID → Web application**, then add these **Authorized redirect URIs**:
    - `http://localhost:3000/api/auth/google/callback`
    - `https://YOUR-DOMAIN/api/auth/google/callback` (when you deploy)
@@ -103,7 +103,7 @@ If tickets sell out while someone is paying, the order is marked FAILED and need
 ## Features
 
 - **Discovery:** search and filter upcoming OOU events by type.
-- **Tickets:** multiple ticket types (Regular, VIP, free), up to 10 per order, each with a unique QR code (`EG-XXXXXXXXXX`).
+- **Tickets:** multiple ticket types (Regular, VIP, free), up to 10 per order, each with a unique QR code (`JV-XXXXXXXXXX`).
 - **Check-in:** camera QR scanner plus manual code entry. Each ticket can be used only once, even with several scanners at the door.
 - **Organizer dashboard:** sales, revenue, check-in counts and attendee list per event.
 - **Organizer applications:** students apply and admins approve or reject them.

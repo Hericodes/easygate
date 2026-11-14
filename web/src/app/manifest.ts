@@ -1,10 +1,10 @@
 import type { MetadataRoute } from "next";
 
-/** Makes EasyGate installable ("Add to Home Screen") so it opens full-screen like an app. */
+/** Makes Jiivent installable ("Add to Home Screen") so it opens full-screen like an app. */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "EasyGate: OOU events and tickets",
-    short_name: "EasyGate",
+    name: "Jiivent: OOU events and tickets",
+    short_name: "Jiivent",
     description: "Discover OOU parties, concerts and programs and get your ticket in seconds.",
     id: "/",
     start_url: "/",

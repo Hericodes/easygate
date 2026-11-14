@@ -33,10 +33,10 @@ export default async function ApplyPage() {
             For OOU clubs, associations &amp; promoters
           </p>
           <h1 className="mt-4 max-w-md text-3xl font-extrabold leading-tight sm:text-4xl">
-            Host your event on <span className="gradient-text-light">EasyGate</span>
+            Host your event on <span className="gradient-text-light">Jiivent</span>
           </h1>
           <p className="mt-3 max-w-lg pb-6 text-white/75">
-            To keep events on EasyGate genuine, organizers are verified before they can sell tickets. Apply here and
+            To keep events on Jiivent genuine, organizers are verified before they can sell tickets. Apply here and
             we&apos;ll review your application, usually within 48 hours.
           </p>
         </div>
@@ -64,7 +64,7 @@ export default async function ApplyPage() {
         {!user ? (
           <div className="space-y-3 text-center">
             <h2 className="text-lg font-bold">First, create a free account</h2>
-            <p className="text-sm text-zinc-500">You&apos;ll apply with your EasyGate account.</p>
+            <p className="text-sm text-zinc-500">You&apos;ll apply with your Jiivent account.</p>
             <Link href="/signup?next=/organizers/apply" className="btn-primary w-full">Sign up</Link>
             <Link href="/login?next=/organizers/apply" className="btn-ghost w-full">I have an account</Link>
           </div>

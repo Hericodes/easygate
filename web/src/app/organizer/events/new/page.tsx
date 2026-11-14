@@ -18,7 +18,7 @@ export default async function NewEventPage() {
       {!autoApprove && (
         <p className="flex items-start gap-3 rounded-2xl bg-brand-50 px-4 py-3 text-sm text-brand-900">
           <ShieldCheckIcon className="mt-0.5 h-5 w-5 shrink-0 text-brand-600" />
-          An EasyGate admin reviews every new event before students can see it, usually within 24 hours. You&apos;ll get
+          An Jiivent admin reviews every new event before students can see it, usually within 24 hours. You&apos;ll get
           a notification when it&apos;s live.
         </p>
       )}

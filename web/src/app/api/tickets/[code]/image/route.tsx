@@ -48,7 +48,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ code: s
               backgroundImage: `linear-gradient(135deg, ${from}, ${to})`,
             }}
           >
-            <div style={{ display: "flex", fontSize: 18, letterSpacing: 4, opacity: 0.85 }}>EASYGATE · ADMIT ONE</div>
+            <div style={{ display: "flex", fontSize: 18, letterSpacing: 4, opacity: 0.85 }}>JIIVENT · ADMIT ONE</div>
             <div style={{ display: "flex", fontSize: 44, lineHeight: 1.15, marginTop: 14 }}>{ticket.event.title}</div>
             <div style={{ display: "flex", fontSize: 22, marginTop: 14, opacity: 0.92 }}>
               {`${d.weekday}, ${d.day} ${d.month} · ${d.time}`}
@@ -95,7 +95,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ code: s
       height: 960,
       headers: {
         "Cache-Control": "private, no-store",
-        "Content-Disposition": `inline; filename="EasyGate-${ticket.code}.png"`,
+        "Content-Disposition": `inline; filename="Jiivent-${ticket.code}.png"`,
       },
     },
   );

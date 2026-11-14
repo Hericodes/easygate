@@ -9,7 +9,7 @@ const KEY = "eg-install-dismissed";
 const QUIET_DAYS = 14;
 
 /**
- * Phone-only "Install EasyGate" card. Android/Chrome gets an Install button;
+ * Phone-only "Install Jiivent" card. Android/Chrome gets an Install button;
  * iPhone Safari gets the Add to Home Screen steps. Hidden once installed or dismissed.
  */
 export default function InstallBanner() {
@@ -68,7 +68,7 @@ export default function InstallBanner() {
           <TicketIcon className="h-6 w-6" />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="font-semibold">Get the EasyGate app</p>
+          <p className="font-semibold">Get the Jiivent app</p>
           {ios ? (
             <p className="mt-0.5 text-sm text-zinc-500">
               Tap <IosShareIcon className="inline h-4 w-4 align-text-bottom text-brand-600" /> then{" "}

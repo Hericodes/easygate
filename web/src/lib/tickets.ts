@@ -6,13 +6,13 @@ const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
 export function newTicketCode() {
   const bytes = crypto.randomBytes(10);
-  let out = "EG-";
+  let out = "JV-"; // tickets issued before the rename start with "EG-" and still work
   for (const b of bytes) out += ALPHABET[b % ALPHABET.length];
   return out;
 }
 
 export function newReference() {
-  return "EG_" + Date.now().toString(36) + "_" + crypto.randomBytes(5).toString("hex");
+  return "JV_" + Date.now().toString(36) + "_" + crypto.randomBytes(5).toString("hex");
 }
 
 /**
